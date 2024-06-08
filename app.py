@@ -9,6 +9,10 @@ def get_model():
     model = BertForSequenceClassification.from_pretrained("pnichite/YTFineTuneBert")
     return tokenizer,model
 
+def get_sentiment_analyzer():
+    return pipeline("sentiment-analysis")
+
+sentiment_analyzer = get_sentiment_analyzer()
 
 tokenizer,model = get_model()
 
