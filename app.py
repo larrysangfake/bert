@@ -1313,7 +1313,7 @@ if dashboard == "Section 7: Time Management":
     functionalities_missing = filtered_data.iloc[:, 60]
 
     #generate wordcloud since the repsonses are too few
-    word_cloud = WordCloud(width=800, height=400, background_color='white', stopwords=functionalities_stopwords).generate(' '.join(functionalities_missing.dropna().astype(str)))
+    word_cloud = WordCloud(width=800, height=400, background_color='white').generate(' '.join(functionalities_missing.dropna().astype(str)))
 
     # Display the word cloud using Streamlit
     st.title('Word Cloud')
@@ -1348,7 +1348,7 @@ if dashboard == "Section 7: Time Management":
     bigram_freq = Counter(bigrams)
 
     # Generate the word cloud
-    phrase_cloud = WordCloud(width=800, height=400, background_color='white', stopwords=features_stopwords).generate_from_frequencies(bigram_freq)
+    phrase_cloud = WordCloud(width=800, height=400, background_color='white', stopwords=functionalities_stopwords).generate_from_frequencies(bigram_freq)
 
     # Display the word cloud using Streamlit
     st.title('Phrase Cloud')
