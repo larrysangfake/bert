@@ -753,8 +753,12 @@ if dashboard == 'Section 4: Learning':
     
     phrases_df = phrases_df[phrases_df['Key Reasons'].str.strip() != '']
 
-    # Display the phrase counts without index
-    st.write(phrases_df.reset_index(drop=True))
+    # Checkbox to decide whether to display the complete DataFrame
+    if st.checkbox('Display complete Key Reasons'):
+        # Display the complete DataFrame
+        st.dataframe(phrases_df)
+    
+    
 
     
 
