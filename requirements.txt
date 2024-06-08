@@ -3,3 +3,4 @@ torch
 transformers
 wordcloud
 pandas
+openpyxl
