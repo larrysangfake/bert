@@ -809,6 +809,89 @@ if dashboard == 'Section 5: Compensation':
     
     st.write(
         f"Among the people who participate the Compensation Campaign, {q30_data_available_pct:.2f}% of the respondents, {q30_data_available_count} employee(s), think that the data available in the Compensation form enables him/her to make a fair decision regarding a promotion, a bonus or a raise.")
+    
+    ### Question33: How would you rate the overall satisfaction regarding the compensation campaign ?
+    satisfaction_ratio = 0.6
+    barcharts_ratio = 1 - satisfaction_ratio
+    satisfaction_col, barcharts_col = st.columns([satisfaction_ratio, barcharts_ratio])
+
+    st.markdown("""
+        <style>
+        .chart-container {
+            padding-top: 20px;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+    
+    with satisfaction_col:
+        st.markdown('<div class="chart-container">', unsafe_allow_html=True)
+        categories = ['Very Dissatisfied', 'Dissatisfied', 'Neutral', 'Satisfied', 'Very Satisfied']
+        q33ValuesCount, q33MedianScore = score_distribution(filtered_data, 40)
+
+        ratings_df = pd.DataFrame({'Satisfaction Level': categories, 'Percentage': q33ValuesCount.values})
+
+        # Display title and median score
+        title_html = f"<h2 style='font-size: 17px; font-family: Arial; color: #333333;'>Rating on Compensation Campaign</h2>"
+        caption_html = f"<div style='font-size: 15px; font-family: Arial; color: #707070;'>The median satisfaction score is {q33MedianScore:.1f}</div>"
+        st.markdown(title_html, unsafe_allow_html=True)
+        st.markdown(caption_html, unsafe_allow_html=True)
+
+        # Create a horizontal bar chart with Plotly
+        fig = px.bar(ratings_df, y='Satisfaction Level', x='Percentage', text='Percentage',
+                     orientation='h',
+                     color='Satisfaction Level', color_discrete_map={
+                'Very Dissatisfied': '#440154',  # Dark purple
+                'Dissatisfied': '#3b528b',  # Dark blue
+                'Neutral': '#21918c',  # Cyan
+                'Satisfied': '#5ec962',  # Light green
+                'Very Satisfied': '#fde725'  # Bright yellow
+            })
+
+        # Remove legend and axes titles
+        fig.update_layout(showlegend=False, xaxis_visible=False, xaxis_title=None, yaxis_title=None, autosize=True,
+                          height=300, margin=dict(l=20, r=20, t=30, b=20))
+
+        # Format text on bars
+        fig.update_traces(texttemplate='%{x:.1f}%', textposition='outside')
+        fig.update_xaxes(range=[0, max(ratings_df['Percentage']) * 1.1])
+
+        # Improve layout aesthetics
+        fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide')
+
+        # Use Streamlit to display the Plotly chart
+        st.plotly_chart(fig, use_container_width=True, key="overall_rating_bar_chart")
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    with barcharts_col:
+        satisfaction_options = ['Select a satisfaction level', 'Very Dissatisfied', 'Dissatisfied', 'Neutral',
+                                'Satisfied', 'Very Satisfied']
+        satisfaction_dropdown1 = st.selectbox('', satisfaction_options,
+                                              key='satisfaction_dropdown1')
+
+        satisfaction_filtered_data1 = filter_by_satisfaction(filtered_data, satisfaction_dropdown1, 40)
+
+        location_summary1, role_summary1, function_summary1 = prepare_summaries(satisfaction_filtered_data1)
+        left_margin = 150
+        total_height = 310
+        role_chart_height = total_height * 0.45
+        function_chart_height = total_height * 0.55
+
+        fig_role1 = px.bar(role_summary1, y='Role', x='Count', orientation='h')
+        fig_role1.update_layout(title="by Role", margin=dict(l=left_margin, r=0, t=50, b=0),
+                                height=role_chart_height, showlegend=False)
+        fig_role1.update_traces(marker_color='#336699', text=role_summary1['Count'], textposition='outside')
+        fig_role1.update_yaxes(showticklabels=True, title='')
+        fig_role1.update_xaxes(showticklabels=False, title='')
+        st.plotly_chart(fig_role1, use_container_width=True, key="roles_bar_chart1")
+
+        fig_function1 = px.bar(function_summary1, y='Function', x='Count', orientation='h')
+        fig_function1.update_layout(title="by Function", margin=dict(l=left_margin, r=0, t=50, b=0),
+                                    height=function_chart_height, showlegend=False)
+        fig_function1.update_traces(marker_color='#336699', text=function_summary1['Count'], textposition='outside')
+        fig_function1.update_yaxes(showticklabels=True, title='')
+        fig_function1.update_xaxes(showticklabels=False, title='')
+        st.plotly_chart(fig_function1, use_container_width=True, key="functions_bar_chart1")
+    
 
     ### Qustion31: What data is missing according to you ?
     st.title("Sentiment Analysis App")
@@ -1006,7 +1089,7 @@ if dashboard == 'Section 6: Payroll':
             unsafe_allow_html=True
         )
 
-        st.title("Sentiment Analysis App")
+    st.title("Sentiment Analysis App")
 
     # Display the specific features of the current system that you like/that made you choose it
     st.markdown('<h1 style="font-size:17px;font-family:Arial;color:#333333;">specific features of your current system that you like/that made you choose it</h1>', unsafe_allow_html=True)
@@ -1086,6 +1169,222 @@ if dashboard == 'Section 6: Payroll':
     b64 = base64.b64encode(csv.encode()).decode()  # some strings <-> bytes conversions necessary here
     href = f'<a href="data:file/csv;base64,{b64}" download="Specific_Features.csv">Download Specific_Features CSV File</a>'
     st.markdown(href, unsafe_allow_html=True)
+
+if dashboard == "Section 7: Time Management":
+    filtered_data = apply_filters(data, st.session_state['selected_role'], st.session_state['selected_function'],
+                                  st.session_state['selected_location'])
+    
+    
+    # A text container for filtering instructions
+    st.markdown(
+        f"""
+        <div class="text-container" style="font-style: italic;">
+        Filter the data by selecting tags from the sidebar. The charts below will be updated to reflect the&nbsp;
+        <strong>{len(filtered_data)}</strong>&nbsp;filtered respondents.
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    
+    
+    ### Question52: Are you part of the Time Management Team ?
+    q52_data_available_count = (filtered_data.iloc[:, 59] == 'Yes').sum()
+    q52_data_available_pct = q52_data_available_count / len(filtered_data) * 100
+   
+    st.markdown(
+    """
+    <h2 style='font-size: 17px; font-family: Arial; color: #333333;'>
+    Time Management Team
+    </h2>
+    """,
+    unsafe_allow_html=True
+    )
+
+    st.write(
+        f"{q52_data_available_pct:.2f}% of the respondents, {q52_data_available_count} employee(s), are part of the time management team.")
+    
+    
+    ### Question53: Do you currently have a time management system ?
+    q53_data_available_count = (filtered_data.iloc[:, 60] == 'Yes').sum()
+    q53_data_available_pct = q53_data_available_count / q52_data_available_count * 100
+   
+    st.markdown(
+    """
+    <h2 style='font-size: 17px; font-family: Arial; color: #333333;'>
+    Time Management System
+    </h2>
+    """,
+    unsafe_allow_html=True
+    )
+
+    st.write(
+        f"Among the people who are part of the time management team, {q53_data_available_pct:.2f}% of the respondents,  {q53_data_available_count} employee(s),  answer that they currently have a time management system.")
+    
+    
+    ### Question54: How satisfied are you with your current time management system ?
+    satisfaction_ratio = 0.6
+    barcharts_ratio = 1 - satisfaction_ratio
+    satisfaction_col, barcharts_col = st.columns([satisfaction_ratio, barcharts_ratio])
+
+    st.markdown("""
+        <style>
+        .chart-container {
+            padding-top: 20px;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+    
+    with satisfaction_col:
+        st.markdown('<div class="chart-container">', unsafe_allow_html=True)
+        categories = ['Very Dissatisfied', 'Dissatisfied', 'Neutral', 'Satisfied', 'Very Satisfied']
+        q54ValuesCount, q54MedianScore = score_distribution(filtered_data, 61)
+
+        ratings_df = pd.DataFrame({'Satisfaction Level': categories, 'Percentage': q54ValuesCount.values})
+
+        # Display title and median score
+        title_html = f"<h2 style='font-size: 17px; font-family: Arial; color: #333333;'>Rating on Current Time Management System</h2>"
+        caption_html = f"<div style='font-size: 15px; font-family: Arial; color: #707070;'>The median satisfaction score is {q54MedianScore:.1f}</div>"
+        st.markdown(title_html, unsafe_allow_html=True)
+        st.markdown(caption_html, unsafe_allow_html=True)
+
+        # Create a horizontal bar chart with Plotly
+        fig = px.bar(ratings_df, y='Satisfaction Level', x='Percentage', text='Percentage',
+                     orientation='h',
+                     color='Satisfaction Level', color_discrete_map={
+                'Very Dissatisfied': '#440154',  # Dark purple
+                'Dissatisfied': '#3b528b',  # Dark blue
+                'Neutral': '#21918c',  # Cyan
+                'Satisfied': '#5ec962',  # Light green
+                'Very Satisfied': '#fde725'  # Bright yellow
+            })
+
+        # Remove legend and axes titles
+        fig.update_layout(showlegend=False, xaxis_visible=False, xaxis_title=None, yaxis_title=None, autosize=True,
+                          height=300, margin=dict(l=20, r=20, t=30, b=20))
+
+        # Format text on bars
+        fig.update_traces(texttemplate='%{x:.1f}%', textposition='outside')
+        fig.update_xaxes(range=[0, max(ratings_df['Percentage']) * 1.1])
+
+        # Improve layout aesthetics
+        fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide')
+
+        # Use Streamlit to display the Plotly chart
+        st.plotly_chart(fig, use_container_width=True, key="overall_rating_bar_chart")
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    with barcharts_col:
+        satisfaction_options = ['Select a satisfaction level', 'Very Dissatisfied', 'Dissatisfied', 'Neutral',
+                                'Satisfied', 'Very Satisfied']
+        satisfaction_dropdown38 = st.selectbox('', satisfaction_options,
+                                              key='satisfaction_dropdown38')
+
+        satisfaction_filtered_data1 = filter_by_satisfaction(filtered_data, satisfaction_dropdown38, 61)
+
+        location_summary1, role_summary1, function_summary1 = prepare_summaries(satisfaction_filtered_data1)
+        left_margin = 150
+        total_height = 310
+        role_chart_height = total_height * 0.45
+        function_chart_height = total_height * 0.55
+
+        fig_role1 = px.bar(role_summary1, y='Role', x='Count', orientation='h')
+        fig_role1.update_layout(title="by Role", margin=dict(l=left_margin, r=0, t=50, b=0),
+                                height=role_chart_height, showlegend=False)
+        fig_role1.update_traces(marker_color='#336699', text=role_summary1['Count'], textposition='outside')
+        fig_role1.update_yaxes(showticklabels=True, title='')
+        fig_role1.update_xaxes(showticklabels=False, title='')
+        st.plotly_chart(fig_role1, use_container_width=True, key="roles_bar_chart1")
+
+        fig_function1 = px.bar(function_summary1, y='Function', x='Count', orientation='h')
+        fig_function1.update_layout(title="by Function", margin=dict(l=left_margin, r=0, t=50, b=0),
+                                    height=function_chart_height, showlegend=False)
+        fig_function1.update_traces(marker_color='#336699', text=function_summary1['Count'], textposition='outside')
+        fig_function1.update_yaxes(showticklabels=True, title='')
+        fig_function1.update_xaxes(showticklabels=False, title='')
+        st.plotly_chart(fig_function1, use_container_width=True, key="functions_bar_chart1")
+
+    #Column 60: According to you, what functionalities are missing from your current system ?
+    # Display the functionalities missing from the current system
+    st.markdown('<h1 style="font-size:17px;font-family:Arial;color:#333333;">Functionalities missing from the current system</h1>', unsafe_allow_html=True)
+
+    #stopwords for functionalities missing from the current system
+    functionalities_stopwords = ["functionalities", "system", "payroll", "compensation", "miss", "missing", "this","about", "of", ",", "to", "a", "what", "on", "could", "do", "we", "their", "the", "learning", "management", "system", "employees", "company", "system", "like", "choose", "help", "need", "everyone", "makes", "improved", "improvement", "format", "today", "no", "and","should","more", "training", "data", "according", "you"]
+    
+    functionalities_missing = filtered_data.iloc[:, 60]
+
+    #generate wordcloud since the repsonses are too few
+    word_cloud = WordCloud(width=800, height=400, background_color='white', stopwords=functionalities_stopwords).generate(' '.join(functionalities_missing.dropna().astype(str)))
+
+    # Display the word cloud using Streamlit
+    st.title('Word Cloud')
+    st.image(word_cloud.to_array(), use_column_width=True)
+    
+    #Generate more complex wordcloud if there are more repsonses
+    #drop missing values first
+    functionalities_missing = functionalities_missing.dropna()
+
+    
+    def extract_keyphrases(text):
+        keywords = kw_model.extract_keywords(text, keyphrase_ngram_range=(2, 4), stop_words='english', use_maxsum=True, nr_candidates=20, top_n=1)
+        return ', '.join([word for word, _ in keywords])
+
+    #extract keywords from the text
+    functionalities_missing_keywords = functionalities_missing.apply(extract_keyphrases)
+
+
+    # Function to extract bigrams from text
+    def extract_bigrams(text):
+        tokens = nltk.word_tokenize(text)
+        bigrams = list(ngrams(tokens, 2))
+        return [' '.join(bigram) for bigram in bigrams]
+
+    # Concatenate all text data
+    all_text = ' '.join(functionalities_missing_keywords.astype(str))
+
+    # Generate bigrams
+    bigrams = extract_bigrams(all_text)
+
+    # Count the frequency of each bigram
+    bigram_freq = Counter(bigrams)
+
+    # Generate the word cloud
+    phrase_cloud = WordCloud(width=800, height=400, background_color='white', stopwords=features_stopwords).generate_from_frequencies(bigram_freq)
+
+    # Display the word cloud using Streamlit
+    st.title('Phrase Cloud')
+    st.image(phrase_cloud.to_array(), use_column_width=True)
+
+    st.write("what functionalities are missing from your current system")
+    st.write(functionalities_missing)
+
+    # Function to split and list phrases
+    def list_phrases(dataframe):
+        phrases = []
+        for row in dataframe:
+            if pd.notna(row):
+                phrases.extend([phrase.strip() for phrase in row.split(',')])
+        return phrases
+
+    # List phrases in the DataFrame using the column index (0 in this case)
+    phrases = list_phrases(functionalities_missing_keywords)
+
+    # Convert to DataFrame and sort by phrase length
+    phrases_df = pd.DataFrame(phrases, columns=['Key Reasons']).sort_values(by='Key Reasons', key=lambda x: x.str.len())
+    phrases_df = phrases_df[phrases_df['Key Reasons'].str.strip() != '']
+
+    # Checkbox to decide whether to display the complete DataFrame
+    if st.checkbox('Display complete Key Reasons'):
+        # Convert DataFrame to HTML and display it
+        html = phrases_df.to_html(index=False)
+        st.markdown(html, unsafe_allow_html=True)
+
+    # Convert DataFrame to CSV and generate download link
+    csv = phrases_df.to_csv(index=False)
+    b64 = base64.b64encode(csv.encode()).decode()  # some strings <-> bytes conversions necessary here
+    href = f'<a href="data:file/csv;base64,{b64}" download="Functionalities_missing.csv">Download Functionalities_Missing CSV File</a>'
+    st.markdown(href, unsafe_allow_html=True)
+
+
 
 
 
