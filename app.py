@@ -1385,6 +1385,32 @@ if dashboard == "Section 7: Time Management":
     st.markdown(href, unsafe_allow_html=True)
 
 if dashboard == "Section 8: User Experience":
+    filtered_data = apply_filters(data, st.session_state['selected_role'], st.session_state['selected_function'],
+                                  st.session_state['selected_location'])
+    
+    
+    # A text container for filtering instructions
+    st.markdown(
+        f"""
+        <div class="text-container" style="font-style: italic;">
+        Filter the data by selecting tags from the sidebar. The charts below will be updated to reflect the&nbsp;
+        <strong>{len(filtered_data)}</strong>&nbsp;filtered respondents.
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    
+    
+    ### Question62: In the context of your job, what are the most valuable activities your current HRIS enable you to do?
+    st.markdown(
+    """
+    <h2 style='font-size: 17px; font-family: Arial; color: #333333;'>
+    In the context of your job, what are the most valuable activities your current HRIS enable you to do?
+    </h2>
+    """,
+    unsafe_allow_html=True
+    )
+
     #Column 69: In the context of your job, what are the most valuable activities your current HRIS enable you to do?
 
     # Display the most valuable activities in the current HRIS
