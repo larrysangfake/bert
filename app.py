@@ -755,10 +755,17 @@ if dashboard == 'Section 4: Learning':
 
     # Checkbox to decide whether to display the complete DataFrame
     if st.checkbox('Display complete Key Reasons'):
-        # Display the complete DataFrame
-        st.dataframe(phrases_df)
+        # Convert DataFrame to HTML and display it
+        html = phrases_df.to_html(index=False)
+        st.markdown(html, unsafe_allow_html=True)
+
+    # Convert DataFrame to HTML and generate download link
+    html = phrases_df.to_html(index=False).encode('utf-8')
+    b64 = base64.b64encode(html).decode()  # some strings <-> bytes conversions necessary here
+    href = f'<a href="data:text/html;base64,{b64}" download="Key_Reasons.html">Download Key Reasons HTML File</a>'
+    st.markdown(href, unsafe_allow_html=True)
     
-    
+
 
     
 
