@@ -1303,14 +1303,14 @@ if dashboard == "Section 7: Time Management":
         fig_function1.update_xaxes(showticklabels=False, title='')
         st.plotly_chart(fig_function1, use_container_width=True, key="functions_bar_chart1")
 
-    #Column 60: According to you, what functionalities are missing from your current system ?
+    #Column 66: According to you, what functionalities are missing from your current system ?
     # Display the functionalities missing from the current system
     st.markdown('<h1 style="font-size:17px;font-family:Arial;color:#333333;">Functionalities missing from the current system</h1>', unsafe_allow_html=True)
 
     #stopwords for functionalities missing from the current system
     functionalities_stopwords = ["functionalities", "system", "payroll", "compensation", "miss", "missing", "this","about", "of", ",", "to", "a", "what", "on", "could", "do", "we", "their", "the", "learning", "management", "system", "employees", "company", "system", "like", "choose", "help", "need", "everyone", "makes", "improved", "improvement", "format", "today", "no", "and","should","more", "training", "data", "according", "you"]
     
-    functionalities_missing = filtered_data.iloc[:, 60]
+    functionalities_missing = filtered_data.iloc[:, 66]
 
     #generate wordcloud since the repsonses are too few
     word_cloud = WordCloud(width=800, height=400, background_color='white').generate(' '.join(functionalities_missing.dropna().astype(str)))
