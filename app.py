@@ -171,7 +171,7 @@ elif dashboard == 'Section 8: User Experience':
 if dashboard == 'Section 1: Employee Experience':
     @st.cache(allow_output_mutation=True)
     def get_sentiment_analyzer():
-    return pipeline("sentiment-analysis")
+        return pipeline("sentiment-analysis")
 
     sentiment_analyzer = get_sentiment_analyzer()
     
