@@ -580,13 +580,121 @@ if dashboard == 'Section 3: Performance & Talent':
 
     # Create a horizontal bar chart with Plotly
     fig1 = px.bar(negative_reason_recruiting_counts, x='negative_reasons', y='percentage', text='count',
-                  color='negative_reasons', color_discrete_sequence=['#FFA500'])
+                  color='negative_reasons', color_discrete_sequence=['#FFA500'], orientation='h')
 
     # Customize the tooltip
     fig1.update_traces(hovertemplate='<b>Reason:</b> %{x}<br><b>Count:</b> %{text}')
 
     # Show the chart
     st.plotly_chart(fig1, use_container_width=False)
+
+if dashboard == 'Section 4: Learning':
+    filtered_data = apply_filters(data, st.session_state['selected_role'], st.session_state['selected_function'],
+                                  st.session_state['selected_location'])
+        
+    # A text container for filtering instructions
+    st.markdown(
+        f"""
+        <div class="text-container" style="font-style: italic;">
+        Filter the data by selecting tags from the sidebar. The charts below will be updated to reflect the&nbsp;
+        <strong>{len(filtered_data)}</strong>&nbsp;filtered respondents.
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    
+    
+    satisfaction_ratio = 0.6
+    barcharts_ratio = 1 - satisfaction_ratio
+    satisfaction_col, barcharts_col = st.columns([satisfaction_ratio, barcharts_ratio])
+
+    st.markdown("""
+        <style>
+        .chart-container {
+            padding-top: 20px;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+    
+    
+    ### Question24: From 1 to 5, how satisfied are you with your current learning management system ?
+    with satisfaction_col:
+        st.markdown('<div class="chart-container">', unsafe_allow_html=True)
+        categories = ['Very Dissatisfied', 'Dissatisfied', 'Neutral', 'Satisfied', 'Very Satisfied']
+        q24ValuesCount, q24MedianScore = score_distribution(filtered_data, 31)
+
+        ratings_df = pd.DataFrame({'Satisfaction Level': categories, 'Percentage': q24ValuesCount.values})
+
+        # Display title and median score
+        title_html = f"<h2 style='font-size: 17px; font-family: Arial; color: #333333;'>Rating on Current Learning Management System</h2>"
+        caption_html = f"<div style='font-size: 15px; font-family: Arial; color: #707070;'>The median satisfaction score is {q24MedianScore:.1f}</div>"
+        st.markdown(title_html, unsafe_allow_html=True)
+        st.markdown(caption_html, unsafe_allow_html=True)
+
+        # Create a horizontal bar chart with Plotly
+        fig = px.bar(ratings_df, y='Satisfaction Level', x='Percentage', text='Percentage',
+                     orientation='h',
+                     color='Satisfaction Level', color_discrete_map={
+                'Very Dissatisfied': '#440154',  # Dark purple
+                'Dissatisfied': '#3b528b',  # Dark blue
+                'Neutral': '#21918c',  # Cyan
+                'Satisfied': '#5ec962',  # Light green
+                'Very Satisfied': '#fde725'  # Bright yellow
+            })
+
+        # Remove legend and axes titles
+        fig.update_layout(showlegend=False, xaxis_visible=False, xaxis_title=None, yaxis_title=None, autosize=True,
+                          height=300, margin=dict(l=20, r=20, t=30, b=20))
+
+        # Format text on bars
+        fig.update_traces(texttemplate='%{x:.1f}%', textposition='outside')
+        fig.update_xaxes(range=[0, max(ratings_df['Percentage']) * 1.1])
+
+        # Improve layout aesthetics
+        fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide')
+
+        # Use Streamlit to display the Plotly chart
+        st.plotly_chart(fig, use_container_width=True, key="overall_rating_bar_chart")
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    with barcharts_col:
+        satisfaction_options = ['Select a satisfaction level', 'Very Dissatisfied', 'Dissatisfied', 'Neutral',
+                                'Satisfied', 'Very Satisfied']
+        satisfaction_dropdown1 = st.selectbox('', satisfaction_options,
+                                              key='satisfaction_dropdown1')
+
+        satisfaction_filtered_data1 = filter_by_satisfaction(filtered_data, satisfaction_dropdown1, 31)
+
+        location_summary1, role_summary1, function_summary1 = prepare_summaries(satisfaction_filtered_data1)
+        left_margin = 150
+        total_height = 310
+        role_chart_height = total_height * 0.45
+        function_chart_height = total_height * 0.55
+
+        fig_role1 = px.bar(role_summary1, y='Role', x='Count', orientation='h')
+        fig_role1.update_layout(title="by Role", margin=dict(l=left_margin, r=0, t=50, b=0),
+                                height=role_chart_height, showlegend=False)
+        fig_role1.update_traces(marker_color='#336699', text=role_summary1['Count'], textposition='outside')
+        fig_role1.update_yaxes(showticklabels=True, title='')
+        fig_role1.update_xaxes(showticklabels=False, title='')
+        st.plotly_chart(fig_role1, use_container_width=True, key="roles_bar_chart1")
+
+        fig_function1 = px.bar(function_summary1, y='Function', x='Count', orientation='h')
+        fig_function1.update_layout(title="by Function", margin=dict(l=left_margin, r=0, t=50, b=0),
+                                    height=function_chart_height, showlegend=False)
+        fig_function1.update_traces(marker_color='#336699', text=function_summary1['Count'], textposition='outside')
+        fig_function1.update_yaxes(showticklabels=True, title='')
+        fig_function1.update_xaxes(showticklabels=False, title='')
+        st.plotly_chart(fig_function1, use_container_width=True, key="functions_bar_chart1")
+
+    ### Column 35: What could be improved or what kind of format is missing today ?
+    st.title("Sentiment Analysis App")
+
+    # Display the improvement/missing format for learning management system
+    st.markdown('<h1 style="font-size:17px;font-family:Arial;color:#333333;">the improvement/missing format for learning management system</h1>', unsafe_allow_html=True)
+
+    
+
     
 
 
