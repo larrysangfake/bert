@@ -4,3 +4,4 @@ transformers
 wordcloud
 pandas
 openpyxl
+keybert

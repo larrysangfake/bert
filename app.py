@@ -7,6 +7,9 @@ import pandas as pd
 import numpy as np
 from wordcloud import WordCloud, STOPWORDS
 import os
+from keybert import KeyBERT
+
+
 
 
 score_to_category = {
@@ -177,15 +180,21 @@ if dashboard == 'Section 1: Employee Experience':
                                   st.session_state['selected_location'])
     
 
-
     sentiment_analyzer = get_sentiment_analyzer()
     
+    kw_model = KeyBERT()
+
     st.title("Sentiment Analysis App")
     
     def get_transformer_sentiment(text):
         result = sentiment_analyzer(text)[0]
         return result['score'] if result['label'] == 'POSITIVE' else -result['score']
     
+    # Function to extract keywords using KeyBERT
+    def extract_keywords(text):
+        keywords = kw_model.extract_keywords(text, keyphrase_ngram_range=(1, 3), stop_words='english', use_maxsum=True, nr_candidates=20, top_n=5)
+        return ', '.join([word for word, _ in keywords])
+
     # Apply transformer-based sentiment analysis to each text in the DataFrame
     filtered_data['Communication_Sentiment_Score1'] = filtered_data.iloc[:, 14].apply(get_transformer_sentiment)
 
@@ -193,15 +202,33 @@ if dashboard == 'Section 1: Employee Experience':
     top_5_positive = filtered_data.nlargest(5, 'Communication_Sentiment_Score1')
     top_5_negative = filtered_data.nsmallest(5, 'Communication_Sentiment_Score1')
 
+    # Extract keywords for top 5 positive and negative texts
+    top_5_positive['Key Phrases'] = top_5_positive.iloc[:, 14].apply(extract_keywords)
+    top_5_negative['Key Phrases'] = top_5_negative.iloc[:, 14].apply(extract_keywords)
+
     # Columns to display
-    columns_to_display = ['From 1 to 5, how satisfied are you with the communication channels used to relay important HR information to employees?', 'Which reason(s) drive that score ?']
+    columns_to_display1 = ['From 1 to 5, how satisfied are you with the communication channels used to relay important HR information to employees?', 'Key Phrases']
+
+    
+    # Columns to display
+    columns_to_display2 = ['From 1 to 5, how satisfied are you with the communication channels used to relay important HR information to employees?', 'Which reason(s) drive that score ?']
 
     # Display tables in Streamlit
-    st.write("Top 5 Positive Texts")
-    st.table(top_5_positive[columns_to_display])
+    st.write("Top 5 Positive Key Phrases")
+    st.table(top_5_positive[columns_to_display1])
 
-    st.write("Top 5 Negative Texts")
-    st.table(top_5_negative[columns_to_display])
+    st.write("Top 5 Negative Key Phrases")
+    st.table(top_5_negative[columns_to_display1])
+
+    st.write("Top 5 Positive Responses")
+    st.table(top_5_positive[columns_to_display2])
+
+    st.write("Top 5 Negative Responses")
+    st.table(top_5_negative[columns_to_display2])
+
+    
+    
+
 
 
 
