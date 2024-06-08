@@ -702,22 +702,6 @@ if dashboard == 'Section 4: Learning':
     improvement_and_missing = filtered_data.iloc[:, 35]
     improvement_and_missing = improvement_and_missing.dropna()
 
-    #join all the text into one string
-    text = ' '.join(improvement_and_missing.astype(str))
-
-    #generate the first word_cloud
-    st.write("Word Cloud")
-    wordcloud = WordCloud(width=800, height=400, background_color='white', stopwords=learning_stopwords, collocations=False).generate(text)
-
-    #display the word_cloud
-    fig2, ax = plt.subplots(figsize=(10, 5))
-    ax.imshow(wordcloud, interpolation='bilinear')
-    ax.axis('off')
-    st.pyplot(fig2)
-
-
-
-
     nltk.download('punkt', quiet=True)
 
     def extract_keyphrases(text):
@@ -749,6 +733,44 @@ if dashboard == 'Section 4: Learning':
     # Display the word cloud using Streamlit
     st.title('Phrase Cloud')
     st.image(phrase_cloud.to_array(), use_column_width=True)
+
+    # Sample data (replace this with your actual data)
+    data = {
+        'text': [
+            "like coaching, like coaching options, coaching options",
+            "allows employees create personalized learning paths based roles, create personalized learning paths, implement allows employees create personalized learning paths based",
+            "online courses workshops seminars mentorship programs job training caters, offer variety learning formats online courses, learning formats online courses workshops seminars",
+            "gather insights employees learning experiences involve surveys focus groups discussions, establish regular feedback loops gather insights employees, gather insights employees learning experiences",
+            "maybe focus training, training need general, compulsory training sessions",
+            "think smaller, site sessions, groups site",
+            "long focused, focused job, onboarding training",
+            "develop site, site trainings, develop site trainings"
+        ]
+    }
+
+    # Convert data to DataFrame
+    df = pd.DataFrame(data)
+
+    # Function to split and count phrases
+    def count_phrases(dataframe, column_name):
+        phrases = []
+        for row in dataframe[column_name]:
+            if pd.notna(row):
+                phrases.extend([phrase.strip() for phrase in row.split(',')])
+        phrase_counts = Counter(phrases)
+        return phrase_counts
+
+    # Count phrases in the DataFrame
+    phrase_counts = count_phrases(df, 'text')
+
+    # Convert the Counter object to a DataFrame for better visualization
+    phrase_counts_df = pd.DataFrame(phrase_counts.items(), columns=['Phrase', 'Frequency']).sort_values(by='Frequency', ascending=False)
+
+    # Display the phrase counts
+    print(phrase_counts_df)
+
+    # If you are using Streamlit, you can display the DataFrame as follows:
+    st.write(phrase_counts_df)
 
 
     
