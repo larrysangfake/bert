@@ -8,6 +8,8 @@ import numpy as np
 from wordcloud import WordCloud, STOPWORDS
 import os
 from keybert import KeyBERT
+import plotly.express as px
+
 
 
 
@@ -171,7 +173,60 @@ elif dashboard == 'Section 7: Time Management':
 elif dashboard == 'Section 8: User Experience':
     render_header("User Experience")
 
+def prepare_summaries(data):
+    continent_to_country_code = {
+        'Asia': 'KAZ',
+        'Oceania': 'AUS',
+        'North America': 'CAN',
+        'South America': 'BRA',
+        'Europe': 'DEU',
+        'Africa': 'TCD'
+    }
+    country_code_to_continent = {v: k for k, v in continent_to_country_code.items()}
+    location_summary = pd.DataFrame(data['Where are you located ?'].value_counts()).reset_index()
+    location_summary.columns = ['Continent', 'Count']
+    location_summary['Country_Code'] = location_summary['Continent'].map(continent_to_country_code)
+    location_summary['Label'] = location_summary['Continent'].apply(
+        lambda x: f"{x}: {location_summary.loc[location_summary['Continent'] == x, 'Count'].iloc[0]}")
+
+    role_summary = pd.DataFrame(data['What is your role at the company ?'].value_counts()).reset_index()
+    role_summary.columns = ['Role', 'Count']
+    function_summary = pd.DataFrame(data['What function are you part of ?'].value_counts()).reset_index()
+    function_summary.columns = ['Function', 'Count']
+    return location_summary, role_summary, function_summary
+
+# MARIAS SCORE DISTRIBUTION FUNCTION
+def score_distribution(data, column_index):
+    # Extract the data series based on the column index
+    data_series = data.iloc[:, column_index]
+
+    # Calculate the percentage of each response
+    value_counts = data_series.value_counts(normalize=True).sort_index() * 100
+
+    # Ensure the value_counts includes all categories with zero counts for missing categories
+    value_counts = value_counts.reindex(range(1, 6), fill_value=0)
+
+    # Create the DataFrame
+
+    # Calculate the median score
+    raw_counts = data_series.value_counts().sort_index()
+    scores = np.repeat(raw_counts.index, raw_counts.values)
+    median_score = np.median(scores)
+
+    return value_counts, median_score
+
+satisfaction_options = ['Select a satisfaction level', 'Very Dissatisfied', 'Dissatisfied', 'Neutral',
+                                'Satisfied', 'Very Satisfied']
+
+def filter_by_satisfaction(data, satisfaction_level, column_index):
+    if satisfaction_level != 'Select a satisfaction level':
+        data = data[data.iloc[:, column_index] == satisfaction_options.index(satisfaction_level)]
+    return data
+
+
 if dashboard == 'Section 1: Employee Experience':
+
+    
     @st.cache(allow_output_mutation=True)
     def get_sentiment_analyzer():
         return pipeline("sentiment-analysis")
@@ -179,6 +234,87 @@ if dashboard == 'Section 1: Employee Experience':
     filtered_data = apply_filters(data, st.session_state['selected_role'], st.session_state['selected_function'],
                                   st.session_state['selected_location'])
     
+    # A text container for filtering instructions
+    st.markdown(
+        f"""
+        <div class="text-container" style="font-style: italic;">
+        Filter the data by selecting tags from the sidebar. The charts below will be updated to reflect the&nbsp;
+        <strong>{len(filtered_data)}</strong>&nbsp;filtered respondents.
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    satisfaction_ratio = 0.6
+    barcharts_ratio = 1 - satisfaction_ratio
+    satisfaction_col, barcharts_col = st.columns([satisfaction_ratio, barcharts_ratio])
+    
+    with satisfaction_col:
+        st.markdown('<div class="chart-container">', unsafe_allow_html=True)
+        categories = ['Very Dissatisfied', 'Dissatisfied', 'Neutral', 'Satisfied', 'Very Satisfied']
+        q11ValuesCount, q11MedianScore = score_distribution(filtered_data, 13)
+
+        ratings_df = pd.DataFrame({'Satisfaction Level': categories, 'Percentage': q11ValuesCount.values})
+
+        # Display title and median score
+        title_html = f"<h2 style='font-size: 17px; font-family: Arial; color: #333333;'>Rating on HR Communication Channels</h2>"
+        caption_html = f"<div style='font-size: 15px; font-family: Arial; color: #707070;'>The median satisfaction score is {q11MedianScore:.1f}</div>"
+        st.markdown(title_html, unsafe_allow_html=True)
+        st.markdown(caption_html, unsafe_allow_html=True)
+
+        # Create a horizontal bar chart with Plotly
+        fig = px.bar(ratings_df, y='Satisfaction Level', x='Percentage', text='Percentage',
+                     orientation='h',
+                     color='Satisfaction Level', color_discrete_map={
+                'Very Dissatisfied': '#440154',  # Dark purple
+                'Dissatisfied': '#3b528b',  # Dark blue
+                'Neutral': '#21918c',  # Cyan
+                'Satisfied': '#5ec962',  # Light green
+                'Very Satisfied': '#fde725'  # Bright yellow
+            })
+
+        # Remove legend and axes titles
+        fig.update_layout(showlegend=False, xaxis_visible=False, xaxis_title=None, yaxis_title=None, autosize=True,
+                          height=300, margin=dict(l=20, r=20, t=30, b=20))
+        fig.update_xaxes(range=[0, max(ratings_df['Percentage']) * 1.1])
+
+        # Format text on bars
+        fig.update_traces(texttemplate='%{x:.1f}%', textposition='outside')
+
+        # Improve layout aesthetics
+        fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide')
+
+        # Use Streamlit to display the Plotly chart
+        st.plotly_chart(fig, use_container_width=True, key="rating_hr_communication_channels_bar_chart")
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    with barcharts_col:
+        satisfaction_dropdown2 = st.selectbox('', satisfaction_options,
+                                              key='satisfaction_dropdown2')
+
+        satisfaction_filtered_data2 = filter_by_satisfaction(filtered_data, satisfaction_dropdown2, 13)
+
+        location_summary2, role_summary2, function_summary2 = prepare_summaries(satisfaction_filtered_data2)
+        left_margin = 150
+        total_height = 310
+        role_chart_height = total_height * 0.45
+        function_chart_height = total_height * 0.55
+
+        fig_role2 = px.bar(role_summary2, y='Role', x='Count', orientation='h')
+        fig_role2.update_layout(title="by Role", margin=dict(l=left_margin, r=0, t=50, b=0),
+                                height=role_chart_height, showlegend=False)
+        fig_role2.update_traces(marker_color='#336699', text=role_summary2['Count'], textposition='outside')
+        fig_role2.update_yaxes(showticklabels=True, title='')
+        fig_role2.update_xaxes(showticklabels=False, title='')
+        st.plotly_chart(fig_role2, use_container_width=True, key="roles_bar_chart2")
+
+        fig_function2 = px.bar(function_summary2, y='Function', x='Count', orientation='h')
+        fig_function2.update_layout(title="by Function", margin=dict(l=left_margin, r=0, t=50, b=0),
+                                    height=function_chart_height, showlegend=False)
+        fig_function2.update_traces(marker_color='#336699', text=function_summary2['Count'], textposition='outside')
+        fig_function2.update_yaxes(showticklabels=True, title='')
+        fig_function2.update_xaxes(showticklabels=False, title='')
+        st.plotly_chart(fig_function2, use_container_width=True, key="functions_bar_chart2")
 
     sentiment_analyzer = get_sentiment_analyzer()
     
