@@ -1384,6 +1384,274 @@ if dashboard == "Section 7: Time Management":
     href = f'<a href="data:file/csv;base64,{b64}" download="Functionalities_missing.csv">Download Functionalities_Missing CSV File</a>'
     st.markdown(href, unsafe_allow_html=True)
 
+if dashboard == "Section 8: User Experience":
+    #Column 69: In the context of your job, what are the most valuable activities your current HRIS enable you to do?
+
+    # Display the most valuable activities in the current HRIS
+    st.markdown('<h1 style="font-size:17px;font-family:Arial;color:#333333;">Most Valuable Activities in the Current HRIS</h1>', unsafe_allow_html=True)
+
+    #stopwords for most valuable activities in the current HRIS
+    HRIS_stopwords = ["HRIS", "valuable", "system", "HR", "current", "functionalities", "system", "payroll", "compensation", "miss", "missing", "this","about", "of", ",", "to", "a", "what", "on", "could", "do", "we", "their", "the", "learning", "management", "system", "employees", "company", "system", "like", "choose", "help", "need", "everyone", "makes", "improved", "improvement", "format", "today", "no", "and","should","more", "training", "data", "according", "you"]
+    
+    valuable_activities = filtered_data.iloc[:, 69]
+
+    #generate wordcloud since the repsonses are too few
+    word_cloud_valuable = WordCloud(width=800, height=400, background_color='white', stopwords=HRIS_stopwords).generate(' '.join(valuable_activities.dropna().astype(str)))
+
+    # Display the word cloud using Streamlit
+    st.title('Word Cloud for Most Valuable Activities in the Current HRIS')
+    st.image(word_cloud_valuable.to_array(), use_column_width=True)
+    
+    #Generate more complex wordcloud if there are more repsonses
+    #drop missing values first
+    valuable_activities = valuable_activities.dropna()
+
+    
+    def extract_keyphrases(text):
+        keywords = kw_model.extract_keywords(text, keyphrase_ngram_range=(2, 4), stop_words='english', use_maxsum=True, nr_candidates=20, top_n=1)
+        return ', '.join([word for word, _ in keywords])
+
+    #extract keywords from the text
+    valuable_activities_keywords = valuable_activities.apply(extract_keyphrases)
+
+
+    # Function to extract bigrams from text
+    def extract_bigrams(text):
+        tokens = nltk.word_tokenize(text)
+        bigrams = list(ngrams(tokens, 2))
+        return [' '.join(bigram) for bigram in bigrams]
+
+    # Concatenate all text data
+    valuable_text = ' '.join(valuable_activities_keywords.astype(str))
+
+    # Generate bigrams
+    bigrams_valuable = extract_bigrams(valuable_text)
+
+    # Count the frequency of each bigram
+    bigram_freq_valuable = Counter(bigrams_valuable)
+
+    # Generate the word cloud
+    phrase_cloud_valuable = WordCloud(width=800, height=400, background_color='white', stopwords=HRIS_stopwords).generate_from_frequencies(bigram_freq_valuable)
+
+    # Display the word cloud using Streamlit
+    st.title('Phrase Cloud for Most Valuable Activities in the Current HRIS')
+    st.image(phrase_cloud_valuable.to_array(), use_column_width=True)
+
+    st.write("what are the most valuable activities your current HRIS enable you to do")
+    # Function to split and list phrases
+    def list_phrases(dataframe):
+        phrases = []
+        for row in dataframe:
+            if pd.notna(row):
+                phrases.extend([phrase.strip() for phrase in row.split(',')])
+        return phrases
+
+    # List phrases in the DataFrame using the column index (0 in this case)
+    phrases_valuable = list_phrases(valuable_activities_keywords)
+
+    # Convert to DataFrame and sort by phrase length
+    phrases_valuable_df = pd.DataFrame(phrases_valuable, columns=['Key Reasons']).sort_values(by='Key Reasons', key=lambda x: x.str.len())
+    phrases_valuable_df = phrases_df[phrases_valuable_df['Key Reasons'].str.strip() != '']
+
+    # Checkbox to decide whether to display the complete DataFrame
+    if st.checkbox('Display complete Key Reasons'):
+        # Convert DataFrame to HTML and display it
+        html = phrases_valuable_df.to_html(index=False)
+        st.markdown(html, unsafe_allow_html=True)
+
+    # Convert DataFrame to CSV and generate download link
+    csv_valuable = phrases_valuable_df.to_csv(index=False)
+    b64_valauable = base64.b64encode(csv_valuable.encode()).decode()  # some strings <-> bytes conversions necessary here
+    href_valuable = f'<a href="data:file/csv;base64,{b64_valauable}" download="Most_Valuable_Activities.csv">Download Most_Valuable_Activities CSV File</a>'
+    st.markdown(href_valuable, unsafe_allow_html=True)
+
+    #Column 70: In the context of your job, what do your current HRIS fail to address?
+
+    # Display the most functions are missing in the current HRIS
+    st.markdown('<h1 style="font-size:17px;font-family:Arial;color:#333333;">Most Functions Missing in the Current HRIS</h1>', unsafe_allow_html=True)
+
+    #stopwords for most functions are missing in the current HRIS
+    HRIS_stopwords2 = ["fail", "address", "missing", "HRIS", "valuable", "system", "HR", "current", "functionalities", "system", "payroll", "compensation", "miss", "missing", "this","about", "of", ",", "to", "a", "what", "on", "could", "do", "we", "their", "the", "learning", "management", "system", "employees", "company", "system", "like", "choose", "help", "need", "everyone", "makes", "improved", "improvement", "format", "today", "no", "and","should","more", "training", "data", "according", "you"]
+
+    functions_missing = filtered_data.iloc[:, 70]
+
+    #generate wordcloud since the repsonses are too few
+    word_cloud_functions = WordCloud(width=800, height=400, background_color='white', stopwords=HRIS_stopwords2).generate(' '.join(functions_missing.dropna().astype(str)))
+
+    # Display the word cloud using Streamlit
+    st.title('Word Cloud for Most Functions Missing in the Current HRIS')
+    st.image(word_cloud_functions.to_array(), use_column_width=True)
+
+    #Generate more complex wordcloud if there are more repsonses
+
+    #drop missing values first
+    functions_missing = functions_missing.dropna()
+
+    #extract keywords from the text
+    functions_missing_keywords = functions_missing.apply(extract_keyphrases)
+
+    # Concatenate all text data
+    functions_text = ' '.join(functions_missing_keywords.astype(str))
+
+    # Generate bigrams
+    bigrams_functions = extract_bigrams(functions_text)
+
+    # Count the frequency of each bigram
+    bigram_freq_functions = Counter(bigrams_functions)
+
+    # Generate the word cloud
+    phrase_cloud_functions = WordCloud(width=800, height=400, background_color='white', stopwords=HRIS_stopwords2).generate_from_frequencies(bigram_freq_functions)
+
+    # Display the word cloud using Streamlit
+    st.title('Phrase Cloud for Most Functions Missing in the Current HRIS')
+    st.image(phrase_cloud_functions.to_array(), use_column_width=True)
+
+    st.write("what do your current HRIS fail to address")
+
+    # Function to split and list phrases
+    phrases_functions = list_phrases(functions_missing_keywords)
+
+    # Convert to DataFrame and sort by phrase length
+    phrases_functions_df = pd.DataFrame(phrases_functions, columns=['Key Reasons']).sort_values(by='Key Reasons', key=lambda x: x.str.len())
+    phrases_functions_df = phrases_functions_df[phrases_functions_df['Key Reasons'].str.strip() != '']
+
+    # Checkbox to decide whether to display the complete DataFrame
+    if st.checkbox('Display complete Key Reasons'):
+        # Convert DataFrame to HTML and display it
+        html = phrases_functions_df.to_html(index=False)
+        st.markdown(html, unsafe_allow_html=True)
+    
+    # Convert DataFrame to CSV and generate download link
+    csv_functions = phrases_functions_df.to_csv(index=False)
+    b64_functions = base64.b64encode(csv_functions.encode()).decode()  # some strings <-> bytes conversions necessary here
+    href_functions = f'<a href="data:file/csv;base64,{b64_functions}" download="Most_Functions_Missing.csv">Download Most_Functions_Missing CSV File</a>'
+    st.markdown(href_functions, unsafe_allow_html=True)
+
+    #Column 72: In 3 words, how would you describe your experience with the current HRIS?
+    st.markdown('<h1 style="font-size:17px;font-family:Arial;color:#333333;">Overall Experience with the Current HRIS</h1>', unsafe_allow_html=True)
+
+    #sentiment analysis for overall experience with the current HRIS
+
+    #get the data
+    overall_experience = filtered_data.iloc[:, 72]
+
+    # Function to extract bigrams from text
+    def extract_bigrams3(text):
+        tokens = nltk.word_tokenize(text)
+        bigrams = list(ngrams(tokens, 3))
+        return [' '.join(bigram) for bigram in bigrams]
+    
+    #drop missing values first
+    overall_experience = overall_experience.dropna()
+
+    # Concatenate all text data
+    overall_text = ' '.join(overall_experience.astype(str))
+
+    # Generate bigrams
+    bigrams_overall = extract_bigrams3(overall_text)
+
+    # Count the frequency of each bigram
+    bigram_freq_overall = Counter(bigrams_overall)
+
+    # Generate the word cloud
+    phrase_cloud_overall = WordCloud(width=800, height=400, background_color='white', stopwords = HRIS_stopwords2).generate_from_frequencies(bigram_freq_overall)
+
+    # Display the word cloud using Streamlit
+    st.title('Phrase Cloud for Overall Experience with the Current HRIS')
+    st.image(phrase_cloud_overall.to_array(), use_column_width=True)
+
+    #sentiment analysis for overall experience with the current HRIS
+    st.write("In 3 words, how would you describe your experience with the current HRIS?")
+
+    #Get sentiment result for each row
+    sentiment_result = filtered_data.apply(lambda x: sentiment_analyzer(filtered_data.iloc[:,72]))
+
+    st.write(sentiment_result)
+
+    #count the number of positive, negative and neutral sentiments
+    sentiment_count = sentiment_result.value_counts()
+
+    #create a horinzontal bar chart
+    sentiment_ratio = 0.6
+    barcharts_ratio = 1 - satisfaction_ratio
+    satisfaction_col, barcharts_col = st.columns([satisfaction_ratio, barcharts_ratio])
+
+    st.markdown("""
+        <style>
+        .chart-container {
+            padding-top: 20px;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+    
+    with satisfaction_col:
+        st.markdown('<div class="chart-container">', unsafe_allow_html=True)
+        categories = ['Positive', 'Neutral', 'Negative']
+        sentiment_values = sentiment_result.value_counts()
+
+        sentiment_df = pd.DataFrame({'Sentiment Level': categories, 'Count': sentiment_values.values})
+
+        # Display title
+        title_html = f"<h2 style='font-size: 17px; font-family: Arial; color: #333333;'>Sentiment Analysis</h2>"
+        st.markdown(title_html, unsafe_allow_html=True)
+
+        # Create a horizontal bar chart with Plotly
+        fig = px.bar(sentiment_df, y='Sentiment Level', x='Count', text='Count',
+                     orientation='h',
+                     color='Sentiment Level', color_discrete_map={
+                'Positive': '#5ec962',  # Light green
+                'Neutral': '#21918c',  # Cyan
+                'Negative': '#3b528b'  # Dark blue
+            })
+
+        # Remove legend and axes titles
+        fig.update_layout(showlegend=False, xaxis_visible=False, xaxis_title=None, yaxis_title=None, autosize=True,
+                          height=300, margin=dict(l=20, r=20, t=30, b=20))
+
+        # Format text on bars
+        fig.update_traces(texttemplate='%{x}', textposition='outside')
+        fig.update_xaxes(range=[0, max(sentiment_df['Count']) * 1.1])
+
+        # Improve layout aesthetics
+        fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide')
+
+        # Use Streamlit to display the Plotly chart
+        st.plotly_chart(fig, use_container_width=True, key="sentiment_bar_chart")
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    with barcharts_col:
+        sentiment_options = ['Select a sentiment level', 'Positive', 'Neutral', 'Negative']
+        sentiment_dropdown = st.selectbox('', sentiment_options,
+                                              key='sentiment_dropdown')
+
+        sentiment_filtered_data = filter_by_sentiment(overall_experience, sentiment_dropdown)
+
+        location_summary, role_summary, function_summary = prepare_summaries(sentiment_filtered_data)
+        left_margin = 150
+        total_height = 310
+        role_chart_height = total_height * 0.45
+        function_chart_height = total_height * 0.55
+
+        fig_role = px.bar(role_summary, y='Role', x='Count', orientation='h')
+        fig_role.update_layout(title="by Role", margin=dict(l=left_margin, r=0, t=50, b=0),
+                                height=role_chart_height, showlegend=False)
+        fig_role.update_traces(marker_color='#336699', text=role_summary['Count'], textposition='outside')
+        fig_role.update_yaxes(showticklabels=True, title='')
+        fig_role.update_xaxes(showticklabels=False, title='')
+        st.plotly_chart(fig_role, use_container_width=True, key="roles_bar_chart")
+
+        fig_function = px.bar(function_summary, y='Function', x='Count', orientation='h')
+        fig_function.update_layout(title="by Function", margin=dict(l=left_margin, r=0, t=50, b=0),
+                                    height=function_chart_height, showlegend=False)
+        fig_function.update_traces(marker_color='#336699', text=function_summary['Count'], textposition='outside')
+        fig_function.update_yaxes(showticklabels=True, title='')
+        fig_function.update_xaxes(showticklabels=False, title='')
+        st.plotly_chart(fig_function, use_container_width=True, key="functions_bar_chart")
+
+
+
+
+
 
 
 
