@@ -734,6 +734,8 @@ if dashboard == 'Section 4: Learning':
     st.title('Phrase Cloud')
     st.image(phrase_cloud.to_array(), use_column_width=True)
 
+    st.write(improvement_and_missing_keywords)
+
 
     # Function to split and list phrases
     def list_phrases(dataframe, column_name):
