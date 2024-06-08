@@ -847,7 +847,7 @@ if dashboard == 'Section 5: Compensation':
     bigram_freq = Counter(bigrams)
 
     # Generate the word cloud
-    phrase_cloud = WordCloud(width=800, height=400, background_color='white', stopwords=learning_stopwords).generate_from_frequencies(bigram_freq)
+    phrase_cloud = WordCloud(width=800, height=400, background_color='white', stopwords=compensation_stopwords).generate_from_frequencies(bigram_freq)
 
     # Display the word cloud using Streamlit
     st.title('Phrase Cloud')
