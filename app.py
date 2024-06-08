@@ -16,7 +16,7 @@ import nltk
 from nltk.util import ngrams
 
 
-
+nltk.download('punkt', quiet=True)
 
 score_to_category = {
     1: 'Very Dissatisfied',
@@ -703,7 +703,7 @@ if dashboard == 'Section 4: Learning':
     improvement_and_missing = filtered_data.iloc[:, 35]
     improvement_and_missing = improvement_and_missing.dropna()
 
-    nltk.download('punkt', quiet=True)
+    
 
     def extract_keyphrases(text):
         keywords = kw_model.extract_keywords(text, keyphrase_ngram_range=(2, 10), stop_words='english', use_maxsum=True, nr_candidates=20, top_n=3)
@@ -735,9 +735,6 @@ if dashboard == 'Section 4: Learning':
     st.title('Phrase Cloud')
     st.image(phrase_cloud.to_array(), use_column_width=True)
 
-    st.write(improvement_and_missing_keywords)
-
-
     # Function to split and list phrases
     def list_phrases(dataframe):
         phrases = []
@@ -766,51 +763,122 @@ if dashboard == 'Section 4: Learning':
     href = f'<a href="data:file/csv;base64,{b64}" download="Key_Reasons.csv">Download Key Reasons CSV File</a>'
     st.markdown(href, unsafe_allow_html=True)
 
+if dashboard == 'Section 5: Compensation':
+    filtered_data = apply_filters(data, st.session_state['selected_role'], st.session_state['selected_function'],
+                                  st.session_state['selected_location'])
+    
+    # A text container for filtering instructions
+    st.markdown(
+        f"""
+        <div class="text-container" style="font-style: italic;">
+        Filter the data by selecting tags from the sidebar. The charts below will be updated to reflect the&nbsp;
+        <strong>{len(filtered_data)}</strong>&nbsp;filtered respondents.
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    
+    ### Qustion29: Do you participate in the Compensation Campaign ?
+    q29_data_available_count = (filtered_data.iloc[:, 36] == 'Yes').sum()
+    q29_data_available_pct = q29_data_available_count / len(filtered_data) * 100
+   
+    st.markdown(
+    """
+    <h2 style='font-size: 17px; font-family: Arial; color: #333333;'>
+    Compensation Campaign Participation
+    </h2>
+    """,
+    unsafe_allow_html=True
+    )
+
+    st.write(
+        f"{q29_data_available_pct:.2f}% of the respondents, {q29_data_available_count} employee(s), participated in the   compensation campaign.")
+    
+    ### Qustion30: Do you think that the data available in the Compensation form enables you to make a fair decision regarding a promotion, a bonus or a raise ? (e.g : compa-ratio, variation between years, historical data on salary and bonus, …) 
+    q30_data_available_count = (filtered_data.iloc[:, 37] == 'Yes').sum()
+    q30_data_available_pct = q30_data_available_count / q29_data_available_count * 100
+    
+    st.markdown(
+    """
+    <h2 style='font-size: 17px; font-family: Arial; color: #333333;'>
+    Data availability in the Compensation Form
+    </h2>
+    """,
+    unsafe_allow_html=True
+    )
+    
+    st.write(
+        f"Among the people who participate the Compensation Campaign, {q30_data_available_pct:.2f}% of the respondents, {q30_data_available_count} employee(s), think that the data available in the Compensation form enables him/her to make a fair decision regarding a promotion, a bonus or a raise.")
+
+    ### Qustion31: What data is missing according to you ?
+    st.title("Sentiment Analysis App")
+
+    # Display the Data Missing for Compensation
+    st.markdown('<h1 style="font-size:17px;font-family:Arial;color:#333333;">the improvement/missing format for learning management system</h1>', unsafe_allow_html=True)
+
+    #stopwords for data missing for compensation
+    compensation_stopwords = ["compensation", "miss", "missing", "this","about", "of", "to", "a", "what", "on", "could", "do", "we", "their", "the", "learning", "management", "system", "employees", "company", "help", "need", "everyone", "makes", "improved", "improvement", "format", "today", "no", "and","should","more", "training", "data", "according", "you"]
+    
+    data_missing = filtered_data.iloc[:, 38]
+    data_missing = data_missing.dropna()
 
     
+    def extract_keyphrases(text):
+        keywords = kw_model.extract_keywords(text, keyphrase_ngram_range=(2, 6), stop_words='english', use_maxsum=True, nr_candidates=20, top_n=2)
+        return ', '.join([word for word, _ in keywords])
 
-    
-    #check the phrases
-    st.table(improvement_and_missing_keywords.head(20))
-
-    #list every keyphrase as a single one and count the frequency
-    improvement_and_missing_keywords = improvement_and_missing_keywords.str.strip()
-    #check the phrases
-    st.table(improvement_and_missing_keywords.head(20))
-    improvement_and_missing_keywords = improvement_and_missing_keywords[improvement_and_missing_keywords != '']
-    #check the phrases
-    st.table(improvement_and_missing_keywords.head(20))
-    improvement_and_missing_keywords = improvement_and_missing_keywords.value_counts()
-    #check the phrases
-    st.table(improvement_and_missing_keywords.head(20))
-
-    #display the frequency of the keywords
-    st.write("Top 5 Keywords")
-    st.table(improvement_and_missing_keywords.value_counts().head(15))
-    
+    #extract keywords from the text
+    data_missing_keywords = data_missing.apply(extract_keyphrases)
 
 
+    # Function to extract bigrams from text
+    def extract_bigrams(text):
+        tokens = nltk.word_tokenize(text)
+        bigrams = list(ngrams(tokens, 2))
+        return [' '.join(bigram) for bigram in bigrams]
 
-    #generate the word_cloud
-    wordcloud = WordCloud(width=800, height=400, background_color='white', stopwords=learning_stopwords, collocations=False).generate(' '.join(improvement_and_missing_keywords))
+    # Concatenate all text data
+    all_text = ' '.join(data_missing_keywords.astype(str))
 
-    #count frequency of each keyphrase
-    improvement_and_missing_keywords = improvement_and_missing_keywords.str.strip()
-    improvement_and_missing_keywords = improvement_and_missing_keywords[improvement_and_missing_keywords != '']
-    improvement_and_missing_keywords = improvement_and_missing_keywords.value_counts()
+    # Generate bigrams
+    bigrams = extract_bigrams(all_text)
 
-    #display the frequency of the keywords
-    st.write("Top 5 Keywords")
-    st.table(improvement_and_missing_keywords.value_counts().head(15))
+    # Count the frequency of each bigram
+    bigram_freq = Counter(bigrams)
 
+    # Generate the word cloud
+    phrase_cloud = WordCloud(width=800, height=400, background_color='white', stopwords=learning_stopwords).generate_from_frequencies(bigram_freq)
 
+    # Display the word cloud using Streamlit
+    st.title('Phrase Cloud')
+    st.image(phrase_cloud.to_array(), use_column_width=True)
 
+    # Function to split and list phrases
+    def list_phrases(dataframe):
+        phrases = []
+        for row in dataframe:
+            if pd.notna(row):
+                phrases.extend([phrase.strip() for phrase in row.split(',')])
+        return phrases
 
+    # List phrases in the DataFrame using the column index (0 in this case)
+    phrases = list_phrases(data_missing_keywords)
 
+    # Convert to DataFrame and sort by phrase length
+    phrases_df = pd.DataFrame(phrases, columns=['Key Reasons']).sort_values(by='Key Reasons', key=lambda x: x.str.len())
+    phrases_df = phrases_df[phrases_df['Key Reasons'].str.strip() != '']
 
+    # Checkbox to decide whether to display the complete DataFrame
+    if st.checkbox('Display complete Key Reasons'):
+        # Convert DataFrame to HTML and display it
+        html = phrases_df.to_html(index=False)
+        st.markdown(html, unsafe_allow_html=True)
 
-
-        
+    # Convert DataFrame to CSV and generate download link
+    csv = phrases_df.to_csv(index=False)
+    b64 = base64.b64encode(csv.encode()).decode()  # some strings <-> bytes conversions necessary here
+    href = f'<a href="data:file/csv;base64,{b64}" download="Key_Reasons.csv">Download Key Reasons CSV File</a>'
+    st.markdown(href, unsafe_allow_html=True)
 
 
 
