@@ -172,18 +172,39 @@ if dashboard == 'Section 1: Employee Experience':
     @st.cache(allow_output_mutation=True)
     def get_sentiment_analyzer():
         return pipeline("sentiment-analysis")
+    
+    filtered_data = apply_filters(data, st.session_state['selected_role'], st.session_state['selected_function'],
+                                  st.session_state['selected_location'])
+    
+
 
     sentiment_analyzer = get_sentiment_analyzer()
     
     st.title("Sentiment Analysis App")
     
-    user_input = st.text_area('Enter Text to Analyze')
-    button = st.button("Analyze")
+    def get_transformer_sentiment(text):
+        result = sentiment_analyzer(text)[0]
+        return result['score'] if result['label'] == 'POSITIVE' else -result['score']
     
-    if user_input and button:
-        result = sentiment_analyzer(user_input)
-        st.write("Sentiment:", result[0]['label'])
-        st.write("Confidence:", result[0]['score'])
+    # Apply transformer-based sentiment analysis to each text in the DataFrame
+    filtered_data['Communication_Sentiment_Score1'] = filtered_data.iloc[:, 14].apply(get_transformer_sentiment)
+
+    # Identify top 5 positive and negative texts
+    top_5_positive = filtered_data.nlargest(5, 'Communication_Sentiment_Score1')
+    top_5_negative = filtered_data.nsmallest(5, 'Communication_Sentiment_Score1')
+
+    # Columns to display
+    columns_to_display = ['From 1 to 5, how satisfied are you with the communication channels used to relay important HR information to employees?', 'Which reason(s) drive that score ?']
+
+    # Display tables in Streamlit
+    st.write("Top 5 Positive Texts")
+    st.table(top_5_positive[columns_to_display])
+
+    st.write("Top 5 Negative Texts")
+    st.table(top_5_negative[columns_to_display])
+
+
+
 
 @st.cache(allow_output_mutation=True)
 def get_model():
