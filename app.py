@@ -1417,7 +1417,7 @@ if dashboard == "Section 8: User Experience":
     st.markdown('<h1 style="font-size:17px;font-family:Arial;color:#333333;">Most Valuable Activities in the Current HRIS</h1>', unsafe_allow_html=True)
 
     #stopwords for most valuable activities in the current HRIS
-    HRIS_stopwords = ["HRIS", "valuable", "system", "HR", "current", "functionalities", "system", "payroll", "compensation", "miss", "missing", "this","about", "of", ",", "to", "a", "what", "on", "could", "do", "we", "their", "the", "learning", "management", "system", "employees", "company", "system", "like", "choose", "help", "need", "everyone", "makes", "improved", "improvement", "format", "today", "no", "and","should","more", "training", "data", "according", "you"]
+    HRIS_stopwords = ["I", "my", "activities", "HRIS", "valuable", "system", "HR", "current", "functionalities", "system", "payroll", "compensation", "miss", "missing", "this","about", "of", ",", "to", "a", "what", "on", "could", "do", "we", "their", "the", "learning", "management", "system", "employees", "company", "system", "like", "choose", "help", "need", "everyone", "makes", "improved", "improvement", "format", "today", "no", "and","should","more", "training", "data", "according", "you"]
     
     valuable_activities = filtered_data.iloc[:, 69]
 
@@ -1477,7 +1477,7 @@ if dashboard == "Section 8: User Experience":
 
     # Convert to DataFrame and sort by phrase length
     phrases_valuable_df = pd.DataFrame(phrases_valuable, columns=['Key Reasons']).sort_values(by='Key Reasons', key=lambda x: x.str.len())
-    phrases_valuable_df = phrases_df[phrases_valuable_df['Key Reasons'].str.strip() != '']
+    phrases_valuable_df = phrases_valuable_df[phrases_valuable_df['Key Reasons'].str.strip() != '']
 
     # Checkbox to decide whether to display the complete DataFrame
     if st.checkbox('Display complete Key Reasons'):
@@ -1497,7 +1497,7 @@ if dashboard == "Section 8: User Experience":
     st.markdown('<h1 style="font-size:17px;font-family:Arial;color:#333333;">Most Functions Missing in the Current HRIS</h1>', unsafe_allow_html=True)
 
     #stopwords for most functions are missing in the current HRIS
-    HRIS_stopwords2 = ["fail", "address", "missing", "HRIS", "valuable", "system", "HR", "current", "functionalities", "system", "payroll", "compensation", "miss", "missing", "this","about", "of", ",", "to", "a", "what", "on", "could", "do", "we", "their", "the", "learning", "management", "system", "employees", "company", "system", "like", "choose", "help", "need", "everyone", "makes", "improved", "improvement", "format", "today", "no", "and","should","more", "training", "data", "according", "you"]
+    HRIS_stopwords2 = ["I", "my", "activities", "fail", "address", "missing", "HRIS", "valuable", "system", "HR", "current", "functionalities", "system", "payroll", "compensation", "miss", "missing", "this","about", "of", ",", "to", "a", "what", "on", "could", "do", "we", "their", "the", "learning", "management", "system", "employees", "company", "system", "like", "choose", "help", "need", "everyone", "makes", "improved", "improvement", "format", "today", "no", "and","should","more", "training", "data", "according", "you"]
 
     functions_missing = filtered_data.iloc[:, 70]
 
