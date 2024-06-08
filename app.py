@@ -223,6 +223,46 @@ def filter_by_satisfaction(data, satisfaction_level, column_index):
         data = data[data.iloc[:, column_index] == satisfaction_options.index(satisfaction_level)]
     return data
 
+############ SENTIMENT ANALYSIS FUNCTION STARTS ############
+def generate_wordclouds(df, score_col_idx, reasons_col_idx, custom_stopwords):
+    # Custom stopwords
+    stopwords_set = set(STOPWORDS)
+    stopwords_set.update(custom_stopwords)
+
+    # Filter the DataFrame for scores 4 and 5
+    df_high_scores = df[df.iloc[:, score_col_idx].isin([4, 5])]
+
+    # Filter the DataFrame for scores 1, 2, and 3
+    df_low_scores = df[df.iloc[:, score_col_idx].isin([1, 2, 3])]
+
+    # Generate the text for word clouds
+    text_high_scores = ' '.join(df_high_scores.iloc[:, reasons_col_idx].astype(str))
+    text_low_scores = ' '.join(df_low_scores.iloc[:, reasons_col_idx].astype(str))
+
+    # Generate the word clouds
+    wordcloud_high_scores = WordCloud(width=800, height=400, background_color='white', stopwords=stopwords_set, collocations=False).generate(text_high_scores)
+    wordcloud_low_scores = WordCloud(width=800, height=400, background_color='white', stopwords=stopwords_set, collocations=False).generate(text_low_scores)
+
+    # Create columns for displaying the word clouds side by side
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.markdown("<h3 style='text-align: center; font-size: 20px; font-weight: normal;'>Word Cloud for High Scores</h3>", unsafe_allow_html=True)
+        fig_high_scores, ax_high_scores = plt.subplots(figsize=(10, 5))
+        ax_high_scores.imshow(wordcloud_high_scores, interpolation='bilinear')
+        ax_high_scores.axis('off')
+        st.pyplot(fig_high_scores)
+
+    with col2:
+        st.markdown("<h3 style='text-align: center; font-size: 20px; font-weight: normal;'>Word Cloud for Low Scores</h3>", unsafe_allow_html=True)
+        fig_low_scores, ax_low_scores = plt.subplots(figsize=(10, 5))
+        ax_low_scores.imshow(wordcloud_low_scores, interpolation='bilinear')
+        ax_low_scores.axis('off')
+        st.pyplot(fig_low_scores)
+
+
+############ SENTIMENT ANALYSIS FUNCTION ENDS ############
+
 
 if dashboard == 'Section 1: Employee Experience':
 
@@ -315,6 +355,18 @@ if dashboard == 'Section 1: Employee Experience':
         fig_function2.update_yaxes(showticklabels=True, title='')
         fig_function2.update_xaxes(showticklabels=False, title='')
         st.plotly_chart(fig_function2, use_container_width=True, key="functions_bar_chart2")
+    
+    # Question 9: Which reason(s) drive that score ?
+    # Display the reasons for communication channel satisfaction
+    st.markdown('<h1 style="font-size:17px;font-family:Arial;color:#333333;">The Reasons for Ratings on Communication Channels</h1>', unsafe_allow_html=True)
+
+    # Example usage
+    communication_stopwords = ["communication", "channels", "HR", "information", "important", "informed", "stay", "communicated", "employees", "company", "help", "communicates", "need", "everyone", "makes"]
+
+    # Run this code in a Streamlit app
+    if __name__ == "__main__":
+        st.markdown("<h1 style='text-align: center; font-size: 24px; font-weight: normal;'>Word Cloud Visualization</h1>", unsafe_allow_html=True)
+        generate_wordclouds(filtered_data, 13, 14, communication_stopwords)
 
     sentiment_analyzer = get_sentiment_analyzer()
     
