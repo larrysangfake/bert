@@ -260,21 +260,14 @@ def generate_wordclouds(df, score_col_idx, reasons_col_idx, custom_stopwords):
         ax_low_scores.axis('off')
         st.pyplot(fig_low_scores)
 
-def apply_sentiment_analysis(df, column_index, sentiment_analyzer):
-    def get_transformer_sentiment(text):
-        result = sentiment_analyzer(text)[0]
-        return result['score'] if result['label'] == 'POSITIVE' else -result['score']
+def get_transformer_sentiment(text):
+    result = sentiment_analyzer(text)[0]
+    return result['score'] if result['label'] == 'POSITIVE' else -result['score']
     
-    df.iloc[:, column_index] = df.iloc[:, column_index].apply(get_transformer_sentiment)
-    return df
-
-def extract_keywords_from_df(df, column_index, kw_model):
-    def extract_keywords(text):
-        keywords = kw_model.extract_keywords(text, keyphrase_ngram_range=(1, 3), stop_words='english', use_maxsum=True, nr_candidates=20, top_n=5)
-        return ', '.join([word for word, _ in keywords])
-    
-    df['Key Phrases'] = df.iloc[:, column_index].apply(extract_keywords)
-    return df
+    # Function to extract keywords using KeyBERT
+def extract_keywords(text):
+    keywords = kw_model.extract_keywords(text, keyphrase_ngram_range=(1, 3), stop_words='english', use_maxsum=True, nr_candidates=20, top_n=5)
+    return ', '.join([word for word, _ in keywords])
 
 
 @st.cache(allow_output_mutation=True)
@@ -393,19 +386,16 @@ if dashboard == 'Section 1: Employee Experience':
         st.markdown("<h1 style='text-align: center; font-size: 24px; font-weight: normal;'>Word Cloud Visualization</h1>", unsafe_allow_html=True)
         generate_wordclouds(filtered_data, 13, 14, communication_stopwords)
 
-
-    column_index = 14  # replace with your column index
-    filtered_data = apply_sentiment_analysis(filtered_data, column_index, sentiment_analyzer)
-    st.table(filtered_data.head(5))
-
+    # Apply transformer-based sentiment analysis to each text in the DataFrame
+    filtered_data['Communication_Sentiment_Score1'] = filtered_data.iloc[:, 14].apply(get_transformer_sentiment)
 
     # Identify top 5 positive and negative texts
     top_5_positive = filtered_data.nlargest(5, 'Communication_Sentiment_Score1')
     top_5_negative = filtered_data.nsmallest(5, 'Communication_Sentiment_Score1')
 
     # Extract keywords for top 5 positive and negative texts
-    top_5_positive['Key Phrases'] = extract_keywords_from_df(top_5_positive, 14, kw_model)
-    top_5_negative['Key Phrases'] = extract_keywords_from_df(top_5_negative, 14, kw_model)
+    top_5_positive['Key Phrases'] = top_5_positive.iloc[:, 14].apply(extract_keywords)
+    top_5_negative['Key Phrases'] = top_5_negative.iloc[:, 14].apply(extract_keywords)
 
     # Columns to display
     columns_to_display1 = ['From 1 to 5, how satisfied are you with the communication channels used to relay important HR information to employees?', 'Key Phrases']
