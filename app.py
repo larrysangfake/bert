@@ -1,3 +1,4 @@
+import base64
 import streamlit as st
 import numpy as np
 from transformers import BertTokenizer, BertForSequenceClassification
@@ -759,12 +760,11 @@ if dashboard == 'Section 4: Learning':
         html = phrases_df.to_html(index=False)
         st.markdown(html, unsafe_allow_html=True)
 
-    # Convert DataFrame to HTML and generate download link
-    html = phrases_df.to_html(index=False).encode('utf-8')
-    b64 = base64.b64encode(html).decode()  # some strings <-> bytes conversions necessary here
-    href = f'<a href="data:text/html;base64,{b64}" download="Key_Reasons.html">Download Key Reasons HTML File</a>'
+    # Convert DataFrame to CSV and generate download link
+    csv = phrases_df.to_csv(index=False)
+    b64 = base64.b64encode(csv.encode()).decode()  # some strings <-> bytes conversions necessary here
+    href = f'<a href="data:file/csv;base64,{b64}" download="Key_Reasons.csv">Download Key Reasons CSV File</a>'
     st.markdown(href, unsafe_allow_html=True)
-    
 
 
     
