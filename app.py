@@ -583,7 +583,7 @@ if dashboard == 'Section 3: Performance & Talent':
                   color='negative_reasons', color_discrete_sequence=['#FFA500'], orientation='h')
 
     # Customize the tooltip
-    fig1.update_traces(hovertemplate='<b>Reason:</b> %{x}<br><b>Count:</b> %{text}')
+    fig1.update_traces(hovertemplate='<b>Reason:</b> %{y}<br><b>Count:</b> %{text}')
 
     # Show the chart
     st.plotly_chart(fig1, use_container_width=False)
