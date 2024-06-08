@@ -283,10 +283,7 @@ kw_model = KeyBERT()
 
 
 if dashboard == 'Section 1: Employee Experience':
-
-    
-    
-    
+    # Apply filters to the data    
     filtered_data = apply_filters(data, st.session_state['selected_role'], st.session_state['selected_function'],
                                   st.session_state['selected_location'])
     
@@ -378,7 +375,7 @@ if dashboard == 'Section 1: Employee Experience':
     # Display the reasons for communication channel satisfaction
     st.markdown('<h1 style="font-size:17px;font-family:Arial;color:#333333;">The Reasons for Ratings on Communication Channels</h1>', unsafe_allow_html=True)
 
-    # Example usage
+    # Define custom stopwords for the word clouds
     communication_stopwords = ["communication", "channels", "HR", "information", "important", "informed", "stay", "communicated", "employees", "company", "help", "communicates", "need", "everyone", "makes"]
 
     # Run this code in a Streamlit app
@@ -417,36 +414,183 @@ if dashboard == 'Section 1: Employee Experience':
     st.write("Top 5 Negative Responses")
     st.table(top_5_negative[columns_to_display2])
 
+if dashboard == 'Section 3: Performance & Talent':
+    # Apply filters to the data
+    filtered_data = apply_filters(data, st.session_state['selected_role'], st.session_state['selected_function'],
+                                  st.session_state['selected_location'])
+    
+    # A text container for filtering instructions
+    st.markdown(
+        f"""
+        <div class="text-container" style="font-style: italic;">
+        Filter the data by selecting tags from the sidebar. The charts below will be updated to reflect the&nbsp;
+        <strong>{len(filtered_data)}</strong>&nbsp;filtered respondents.
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    
+    ### Question19: From 1 to 5, how satisfied are you with the company's performance evaluation and feedback process ?
+    satisfaction_ratio = 0.6
+    barcharts_ratio = 1 - satisfaction_ratio
+    satisfaction_col, barcharts_col = st.columns([satisfaction_ratio, barcharts_ratio])
+
+    st.markdown("""
+        <style>
+        .chart-container {
+            padding-top: 20px;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+
+    with satisfaction_col:
+        st.markdown('<div class="chart-container">', unsafe_allow_html=True)
+        categories = ['Very Dissatisfied', 'Dissatisfied', 'Neutral', 'Satisfied', 'Very Satisfied']
+        q19ValuesCount, q19MedianScore = score_distribution(filtered_data, 26)
+
+        ratings_df = pd.DataFrame({'Satisfaction Level': categories, 'Percentage': q19ValuesCount.values})
+
+        # Display title and median score
+        title_html = f"<h2 style='font-size: 17px; font-family: Arial; color: #333333;'>Rating on Company's Performance Evaluation and Feedback Process</h2>"
+        caption_html = f"<div style='font-size: 15px; font-family: Arial; color: #707070;'>The median satisfaction score is {q19MedianScore:.1f}</div>"
+        st.markdown(title_html, unsafe_allow_html=True)
+        st.markdown(caption_html, unsafe_allow_html=True)
+
+        # Create a horizontal bar chart with Plotly
+        fig = px.bar(ratings_df, y='Satisfaction Level', x='Percentage', text='Percentage',
+                     orientation='h',
+                     color='Satisfaction Level', color_discrete_map={
+                'Very Dissatisfied': '#440154',  # Dark purple
+                'Dissatisfied': '#3b528b',  # Dark blue
+                'Neutral': '#21918c',  # Cyan
+                'Satisfied': '#5ec962',  # Light green
+                'Very Satisfied': '#fde725'  # Bright yellow
+            })
+
+        # Remove legend and axes titles
+        fig.update_layout(showlegend=False, xaxis_visible=False, xaxis_title=None, yaxis_title=None, autosize=True,
+                          height=300, margin=dict(l=20, r=20, t=30, b=20))
+
+        # Format text on bars
+        fig.update_traces(texttemplate='%{x:.1f}%', textposition='outside')
+        fig.update_xaxes(range=[0, max(ratings_df['Percentage']) * 1.1])
+
+        # Improve layout aesthetics
+        fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide')
+
+        # Use Streamlit to display the Plotly chart
+        st.plotly_chart(fig, use_container_width=True, key="overall_rating_bar_chart")
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    with barcharts_col:
+        satisfaction_options = ['Select a satisfaction level', 'Very Dissatisfied', 'Dissatisfied', 'Neutral',
+                                'Satisfied', 'Very Satisfied']
+        satisfaction_dropdown1 = st.selectbox('', satisfaction_options,
+                                              key='satisfaction_dropdown1')
+
+        satisfaction_filtered_data1 = filter_by_satisfaction(filtered_data, satisfaction_dropdown1, 26)
+
+        location_summary1, role_summary1, function_summary1 = prepare_summaries(satisfaction_filtered_data1)
+        left_margin = 150
+        total_height = 310
+        role_chart_height = total_height * 0.45
+        function_chart_height = total_height * 0.55
+
+        fig_role1 = px.bar(role_summary1, y='Role', x='Count', orientation='h')
+        fig_role1.update_layout(title="by Role", margin=dict(l=left_margin, r=0, t=50, b=0),
+                                height=role_chart_height, showlegend=False)
+        fig_role1.update_traces(marker_color='#336699', text=role_summary1['Count'], textposition='outside')
+        fig_role1.update_yaxes(showticklabels=True, title='')
+        fig_role1.update_xaxes(showticklabels=False, title='')
+        st.plotly_chart(fig_role1, use_container_width=True, key="roles_bar_chart1")
+
+        fig_function1 = px.bar(function_summary1, y='Function', x='Count', orientation='h')
+        fig_function1.update_layout(title="by Function", margin=dict(l=left_margin, r=0, t=50, b=0),
+                                    height=function_chart_height, showlegend=False)
+        fig_function1.update_traces(marker_color='#336699', text=function_summary1['Count'], textposition='outside')
+        fig_function1.update_yaxes(showticklabels=True, title='')
+        fig_function1.update_xaxes(showticklabels=False, title='')
+        st.plotly_chart(fig_function1, use_container_width=True, key="functions_bar_chart1")
     
     
+    ### Question20: Which reason(s) drive that score ?
+    st.title("Sentiment Analysis App")
 
+    # Display the reasons for performance evaluation and feedback process satisfaction
+    st.markdown('<h1 style="font-size:17px;font-family:Arial;color:#333333;">The Reasons for Ratings on Performance Evaluation and Feedback Process</h1>', unsafe_allow_html=True)
 
+    # Define custom stopwords for the word clouds
+    performance_stopwords = ["performance", "evaluation", "feedback", "process", "talent", "employees", "company", "help", "need", "everyone", "makes"]
 
-
-
-@st.cache(allow_output_mutation=True)
-def get_model():
-    tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-    model = BertForSequenceClassification.from_pretrained("pnichite/YTFineTuneBert")
-    return tokenizer,model
-
-
-tokenizer,model = get_model()
-
-user_input = st.text_area('Enter Text to Analyze')
-button = st.button("Analyze")
-
-d = {
+    # Run this code in a Streamlit app
+    if __name__ == "__main__":
+        st.markdown("<h1 style='text-align: center; font-size: 24px; font-weight: normal;'>Word Cloud Visualization</h1>", unsafe_allow_html=True)
+        generate_wordclouds(filtered_data, 26, 27, performance_stopwords)
     
-  1:'Toxic',
-  0:'Non Toxic'
-}
+    # Apply transformer-based sentiment analysis to each text in the DataFrame
+    filtered_data['Performance_Sentiment_Score1'] = filtered_data.iloc[:, 27].apply(get_transformer_sentiment)
 
-if user_input and button :
-    test_sample = tokenizer([user_input], padding=True, truncation=True, max_length=512,return_tensors='pt')
-    # test_sample
-    output = model(**test_sample)
-    st.write("Logits: ",output.logits)
-    y_pred = np.argmax(output.logits.detach().numpy(),axis=1)
-    st.write("Prediction: ",d[y_pred[0]])
+    # Identify top 5 positive and negative texts
+    top_5_positive = filtered_data.nlargest(5, 'Performance_Sentiment_Score1')
+    top_5_negative = filtered_data.nsmallest(5, 'Performance_Sentiment_Score1')
+
+    # Extract keywords for top 5 positive and negative texts
+    top_5_positive['Key Phrases'] = top_5_positive.iloc[:, 27].apply(extract_keywords)
+    top_5_negative['Key Phrases'] = top_5_negative.iloc[:, 27].apply(extract_keywords)
+
+    # Columns to display
+    columns_to_display1 = ['From 1 to 5, how satisfied are you with the company\'s performance evaluation and feedback process ?', 'Key Phrases']
+
+    # Columns to display
+    columns_to_display2 = ['From 1 to 5, how satisfied are you with the company\'s performance evaluation and feedback process ?', 'Which reason(s) drive that score ?2']
+
+    # Display tables in Streamlit
+    st.write("Top 5 Positive Key Phrases")
+    st.table(top_5_positive[columns_to_display1])
+
+    st.write("Top 5 Negative Key Phrases")
+    st.table(top_5_negative[columns_to_display1])
+
+    st.write("Top 5 Positive Responses")
+    st.table(top_5_positive[columns_to_display2])
+
+    st.write("Top 5 Negative Responses")
+    st.table(top_5_negative[columns_to_display2])
+
+    st.markdown(
+    """
+    <h2 style='font-size: 17px; font-family: Arial; color: #333333;'>
+    Reasons that drive scores: 1 - Very Uncomfortable / 2 - Uncomfortable / 3 - Hesitant 
+    </h2>
+    """,
+    unsafe_allow_html=True
+    )
+    
+    q29_data = pd.DataFrame({'negative_reasons': filtered_data.iloc[:, 29]})
+    q29_data = q29_data.explode('negative_reasons')
+    q29_data.dropna(inplace=True)
+
+    # Count the occurrences of each negative reason
+    negative_reason_recruiting_counts = q29_data['negative_reasons'].value_counts().reset_index()
+    negative_reason_recruiting_counts.columns = ['negative_reasons', 'count']
+
+    # Calculate percentage
+    negative_reason_recruiting_counts['percentage'] = negative_reason_recruiting_counts['count'] / len(
+        filtered_data) * 100
+
+    # Create a horizontal bar chart with Plotly
+    fig1 = px.bar(negative_reason_recruiting_counts, x='negative_reasons', y='percentage', text='count',
+                  color='negative_reasons', color_discrete_sequence=['#FFA500'])
+
+    # Customize the tooltip
+    fig1.update_traces(hovertemplate='<b>Reason:</b> %{x}<br><b>Count:</b> %{text}')
+
+    # Show the chart
+    st.plotly_chart(fig1, use_container_width=False)
+    
+
+
+
+
+
 
