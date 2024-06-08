@@ -196,3 +196,13 @@ if user_input and button :
     st.write("Logits: ",output.logits)
     y_pred = np.argmax(output.logits.detach().numpy(),axis=1)
     st.write("Prediction: ",d[y_pred[0]])
+
+st.title("Sentiment Analysis App")
+
+user_input = st.text_area('Enter Text to Analyze')
+button = st.button("Analyze")
+
+if user_input and button:
+    result = sentiment_analyzer(user_input)
+    st.write("Sentiment:", result[0]['label'])
+    st.write("Confidence:", result[0]['score'])
