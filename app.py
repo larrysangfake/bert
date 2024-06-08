@@ -695,7 +695,7 @@ if dashboard == 'Section 4: Learning':
     st.markdown('<h1 style="font-size:17px;font-family:Arial;color:#333333;">the improvement/missing format for learning management system</h1>', unsafe_allow_html=True)
 
     #Extract key phrases from the text
-    learning_stopwords = ["this", "a", "what", "on", "could", "do", "we", "their", "the", "learning", "management", "system", "employees", "company", "help", "need", "everyone", "makes", "improved", "improvement", "missing", "format", "today", "no", "and","should","more", "training"]
+    learning_stopwords = ["this","about", "of", "to", "a", "what", "on", "could", "do", "we", "their", "the", "learning", "management", "system", "employees", "company", "help", "need", "everyone", "makes", "improved", "improvement", "missing", "format", "today", "no", "and","should","more", "training"]
 
     improvement_and_missing = filtered_data.iloc[:, 35]
     improvement_and_missing = improvement_and_missing.dropna()
@@ -713,19 +713,30 @@ if dashboard == 'Section 4: Learning':
     st.pyplot(fig2)
 
     def extract_keyphrases(text):
-        keywords = kw_model.extract_keywords(text, keyphrase_ngram_range=(2, 10), stop_words='english', use_maxsum=True, nr_candidates=20, top_n=2)
+        keywords = kw_model.extract_keywords(text, keyphrase_ngram_range=(2, 10), stop_words='english', use_maxsum=True, nr_candidates=20, top_n=3)
         return ', '.join([word for word, _ in keywords])
 
     #extract keywords from the text
     improvement_and_missing_keywords = improvement_and_missing.apply(extract_keyphrases)
 
-
-
-    #list every keyphrase from every row
-    improvement_and_missing_keywords = improvement_and_missing_keywords.str.split(',').explode()
-    
     #check the phrases
-    st.table(improvement_and_missing_keywords.head(5))
+    st.table(improvement_and_missing_keywords.head(20))
+
+    #list every keyphrase as a single one and count the frequency
+    improvement_and_missing_keywords = improvement_and_missing_keywords.str.strip()
+    #check the phrases
+    st.table(improvement_and_missing_keywords.head(20))
+    improvement_and_missing_keywords = improvement_and_missing_keywords[improvement_and_missing_keywords != '']
+    #check the phrases
+    st.table(improvement_and_missing_keywords.head(20))
+    improvement_and_missing_keywords = improvement_and_missing_keywords.value_counts()
+    #check the phrases
+    st.table(improvement_and_missing_keywords.head(20))
+
+    #display the frequency of the keywords
+    st.write("Top 5 Keywords")
+    st.table(improvement_and_missing_keywords.value_counts().head(15))
+    
 
 
 
