@@ -698,55 +698,60 @@ if dashboard == 'Section 4: Learning':
 
 
 
-# Function to download and load models
-def load_models():
-    try:
-        nlp = spacy.load("en_core_web_sm")
-    except OSError:
-        from spacy.cli import download
-        download("en_core_web_sm")
-        nlp = spacy.load("en_core_web_sm")
-    
-    if not benepar.BeneparComponent.has_pipe("benepar"):
-        benepar.download("benepar_en3")
-    nlp.add_pipe("benepar", config={"model": "benepar_en3"})
-    return nlp
+    # Function to download and load models
+    def load_models():
+        try:
+            nlp = spacy.load("en_core_web_sm")
+        except OSError:
+            from spacy.cli import download
+            download("en_core_web_sm")
+            nlp = spacy.load("en_core_web_sm")
+        
+        if not benepar.BeneparComponent.has_pipe("benepar"):
+            benepar.download("benepar_en3")
+        nlp.add_pipe("benepar", config={"model": "benepar_en3"})
+        return nlp
 
-nlp = load_models()
+    st.write("Loading models...")
+    nlp = load_models()
+    st.write("Models loaded.")
 
-def extract_labels(tree, label):
-    if tree.label() == label:
-        yield tree
-    for child in tree:
-        if isinstance(child, benepar.base.BaseTree):
-            yield from extract_labels(child, label)
+    def extract_labels(tree, label):
+        if tree.label() == label:
+            yield tree
+        for child in tree:
+            if isinstance(child, benepar.base.BaseTree):
+                yield from extract_labels(child, label)
 
-st.title("Constituency Parsing with spaCy and benepar")
-sentence = st.text_input("Enter a sentence:", "I know that she is coming.")
+    st.title("Constituency Parsing with spaCy and benepar")
+    sentence = st.text_input("Enter a sentence:", "I know that she is coming.")
+    st.write("Waiting for sentence input...")
+    sentence = st.text_input("Enter a sentence:", "I know that she is coming.")
+    st.write(f"Received sentence: {sentence}")
 
-if sentence:
-    doc = nlp(sentence)
-    st.write("### Parsed Sentence:")
-    st.write([sent.text for sent in doc.sents])
-    
-    for sent in doc.sents:
-        parse_tree = sent._.parse_string
-        st.write("### Parse Tree:")
-        st.write(parse_tree)
-        tree = benepar.Tree.fromstring(parse_tree)
+    if sentence:
+        doc = nlp(sentence)
+        st.write("### Parsed Sentence:")
+        st.write([sent.text for sent in doc.sents])
+        
+        for sent in doc.sents:
+            parse_tree = sent._.parse_string
+            st.write("### Parse Tree:")
+            st.write(parse_tree)
+            tree = benepar.Tree.fromstring(parse_tree)
 
-        sbar_phrases = list(extract_labels(tree, 'SBAR'))
-        np_phrases = list(extract_labels(tree, 'NP'))
+            sbar_phrases = list(extract_labels(tree, 'SBAR'))
+            np_phrases = list(extract_labels(tree, 'NP'))
 
-        st.write("### SBAR components:")
-        for sbar in sbar_phrases:
-            leaves = ' '.join(sbar.leaves())
-            st.write(leaves)
+            st.write("### SBAR components:")
+            for sbar in sbar_phrases:
+                leaves = ' '.join(sbar.leaves())
+                st.write(leaves)
 
-        st.write("### NP components:")
-        for np in np_phrases:
-            leaves = ' '.join(np.leaves())
-            st.write(leaves)
+            st.write("### NP components:")
+            for np in np_phrases:
+                leaves = ' '.join(np.leaves())
+                st.write(leaves)
 
 
 
