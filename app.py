@@ -708,7 +708,7 @@ if dashboard == 'Section 4: Learning':
     #generate the word_cloud
     wordcloud = WordCloud(width=800, height=400, background_color='white', stopwords=learning_stopwords, collocations=False).generate(text)
 
-    
+    nltk.download('punkt')
 
     # Sample data (replace this with your actual data)
     data = {
