@@ -738,15 +738,15 @@ if dashboard == 'Section 4: Learning':
 
 
     # Function to split and list phrases
-    def list_phrases(dataframe, column_index):
+    def list_phrases(dataframe):
         phrases = []
-        for row in dataframe.iloc[:, column_index]:
+        for row in dataframe:
             if pd.notna(row):
                 phrases.extend([phrase.strip() for phrase in row.split(',')])
         return phrases
 
     # List phrases in the DataFrame using the column index (0 in this case)
-    phrases = list_phrases(improvement_and_missing_keywords, 0)
+    phrases = list_phrases(improvement_and_missing_keywords)
 
     # Convert to DataFrame and sort by phrase length
     phrases_df = pd.DataFrame(phrases, columns=['Key Reasons']).sort_values(by='Key Reasons', key=lambda x: x.str.len())
