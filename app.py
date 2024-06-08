@@ -752,7 +752,7 @@ if dashboard == 'Section 4: Learning':
     phrases_df = pd.DataFrame(phrases, columns=['Key Reasons']).sort_values(by='Key Reasons', key=lambda x: x.str.len())
     
     # Display the phrase counts without index
-    st.write(phrases_df(index=False), unsafe_allow_html=True)
+    st.write(phrases_df)
 
     
 
