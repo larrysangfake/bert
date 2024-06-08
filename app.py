@@ -167,16 +167,30 @@ elif dashboard == 'Section 7: Time Management':
     render_header("Time Management")
 elif dashboard == 'Section 8: User Experience':
     render_header("User Experience")
+
+if dashboard == 'Section 1: Employee Experience':
+    @st.cache(allow_output_mutation=True)
+    def get_sentiment_analyzer():
+    return pipeline("sentiment-analysis")
+
+    sentiment_analyzer = get_sentiment_analyzer()
+    
+    st.title("Sentiment Analysis App")
+    
+    user_input = st.text_area('Enter Text to Analyze')
+    button = st.button("Analyze")
+    
+    if user_input and button:
+        result = sentiment_analyzer(user_input)
+        st.write("Sentiment:", result[0]['label'])
+        st.write("Confidence:", result[0]['score'])
+
 @st.cache(allow_output_mutation=True)
 def get_model():
     tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
     model = BertForSequenceClassification.from_pretrained("pnichite/YTFineTuneBert")
     return tokenizer,model
 
-def get_sentiment_analyzer():
-    return pipeline("sentiment-analysis")
-
-sentiment_analyzer = get_sentiment_analyzer()
 
 tokenizer,model = get_model()
 
@@ -197,12 +211,3 @@ if user_input and button :
     y_pred = np.argmax(output.logits.detach().numpy(),axis=1)
     st.write("Prediction: ",d[y_pred[0]])
 
-st.title("Sentiment Analysis App")
-
-user_input = st.text_area('Enter Text to Analyze')
-button = st.button("Analyze")
-
-if user_input and button:
-    result = sentiment_analyzer(user_input)
-    st.write("Sentiment:", result[0]['label'])
-    st.write("Confidence:", result[0]['score'])
