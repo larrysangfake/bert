@@ -712,6 +712,15 @@ if dashboard == 'Section 4: Learning':
     ax.axis('off')
     st.pyplot(fig2)
 
+    #extract keywords from the text
+    improvement_and_missing_keywords = improvement_and_missing.apply(extract_keywords)
+
+    #display the frequency of the keywords
+    st.write("Top 5 Keywords")
+    st.table(improvement_and_missing_keywords.value_counts().head(15))
+
+    
+
 
 
 
