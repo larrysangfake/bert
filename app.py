@@ -705,55 +705,20 @@ if dashboard == 'Section 4: Learning':
     #join all the text into one string
     text = ' '.join(improvement_and_missing.astype(str))
 
-    #generate the word_cloud
+    #generate the first word_cloud
+    st.write("Word Cloud")
     wordcloud = WordCloud(width=800, height=400, background_color='white', stopwords=learning_stopwords, collocations=False).generate(text)
 
-    nltk.download('punkt', quiet=True)
-
-    # Sample data (replace this with your actual data)
-    data = {
-        'text': [
-            "like coaching, like coaching options, coaching options",
-            "allows employees create personalized learning paths based roles, create personalized learning paths, implement allows employees create personalized learning paths based",
-            "online courses workshops seminars mentorship programs job training caters, offer variety learning formats online courses, learning formats online courses workshops seminars",
-            "gather insights employees learning experiences involve surveys focus groups discussions, establish regular feedback loops gather insights employees, gather insights employees learning experiences",
-            "maybe focus training, training need general, compulsory training sessions",
-            "think smaller, site sessions, groups site",
-            "long focused, focused job, onboarding training",
-            "develop site, site trainings, develop site trainings"
-        ]
-    }
-
-    # Convert data to DataFrame
-    df = pd.DataFrame(data)
-
-    # Function to extract bigrams from text
-    def extract_bigrams(text):
-        tokens = nltk.word_tokenize(text)
-        bigrams = list(ngrams(tokens, 2))
-        return [' '.join(bigram) for bigram in bigrams]
-
-    # Concatenate all text data
-    all_text = ' '.join(df['text'])
-
-    # Generate bigrams
-    bigrams = extract_bigrams(all_text)
-
-    # Count the frequency of each bigram
-    bigram_freq = Counter(bigrams)
-
-    # Generate the word cloud
-    wordcloud = WordCloud(width=800, height=400, background_color='white').generate_from_frequencies(bigram_freq)
-
-    # Display the word cloud using Streamlit
-    st.title('Phrase Cloud')
-    st.image(wordcloud.to_array(), use_column_width=True)
-
-    # Display the word cloud
+    #display the word_cloud
     fig2, ax = plt.subplots(figsize=(10, 5))
     ax.imshow(wordcloud, interpolation='bilinear')
     ax.axis('off')
     st.pyplot(fig2)
+
+
+
+
+    nltk.download('punkt', quiet=True)
 
     def extract_keyphrases(text):
         keywords = kw_model.extract_keywords(text, keyphrase_ngram_range=(2, 10), stop_words='english', use_maxsum=True, nr_candidates=20, top_n=3)
@@ -762,6 +727,31 @@ if dashboard == 'Section 4: Learning':
     #extract keywords from the text
     improvement_and_missing_keywords = improvement_and_missing.apply(extract_keyphrases)
 
+
+    # Function to extract bigrams from text
+    def extract_bigrams(text):
+        tokens = nltk.word_tokenize(text)
+        bigrams = list(ngrams(tokens, 2))
+        return [' '.join(bigram) for bigram in bigrams]
+
+    # Concatenate all text data
+    all_text = ' '.join(improvement_and_missing.astype(str))
+
+    # Generate bigrams
+    bigrams = extract_bigrams(all_text)
+
+    # Count the frequency of each bigram
+    bigram_freq = Counter(bigrams)
+
+    # Generate the word cloud
+    phrase_cloud = WordCloud(width=800, height=400, background_color='white').generate_from_frequencies(bigram_freq)
+
+    # Display the word cloud using Streamlit
+    st.title('Phrase Cloud')
+    st.image(phrase_cloud.to_array(), use_column_width=True)
+
+
+    
     #check the phrases
     st.table(improvement_and_missing_keywords.head(20))
 
