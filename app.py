@@ -735,7 +735,7 @@ if dashboard == 'Section 4: Learning':
         return [' '.join(bigram) for bigram in bigrams]
 
     # Concatenate all text data
-    all_text = ' '.join(improvement_and_missing.astype(str))
+    all_text = ' '.join(improvement_and_missing_keywords.astype(str))
 
     # Generate bigrams
     bigrams = extract_bigrams(all_text)
