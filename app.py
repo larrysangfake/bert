@@ -696,8 +696,7 @@ if dashboard == 'Section 4: Learning':
     st.markdown('<h1 style="font-size:17px;font-family:Arial;color:#333333;">the improvement/missing format for learning management system</h1>', unsafe_allow_html=True)
 
     
-    # Load spaCy and benepar model
-    @st.cache(allow_output_mutation=True)
+    # Load spaCy and benepar model without caching
     def load_models():
         nlp = spacy.load("en_core_web_sm")
         if not benepar.BeneparComponent.has_pipe("benepar"):
@@ -740,7 +739,7 @@ if dashboard == 'Section 4: Learning':
 
 
 
-    
+        
 
 
 
