@@ -260,16 +260,39 @@ def generate_wordclouds(df, score_col_idx, reasons_col_idx, custom_stopwords):
         ax_low_scores.axis('off')
         st.pyplot(fig_low_scores)
 
+def apply_sentiment_analysis(df, column_index, sentiment_analyzer):
+    def get_transformer_sentiment(text):
+        result = sentiment_analyzer(text)[0]
+        return result['score'] if result['label'] == 'POSITIVE' else -result['score']
+    
+    df.iloc[:, column_index] = df.iloc[:, column_index].apply(get_transformer_sentiment)
+    return df
+
+def extract_keywords_from_df(df, column_index, kw_model):
+    def extract_keywords(text):
+        keywords = kw_model.extract_keywords(text, keyphrase_ngram_range=(1, 3), stop_words='english', use_maxsum=True, nr_candidates=20, top_n=5)
+        return ', '.join([word for word, _ in keywords])
+    
+    df['Key Phrases'] = df.iloc[:, column_index].apply(extract_keywords)
+    return df
+
+
+@st.cache(allow_output_mutation=True)
+def get_sentiment_analyzer():
+    return pipeline("sentiment-analysis")
+# Usage
+sentiment_analyzer = get_sentiment_analyzer()
+kw_model = KeyBERT()
 
 ############ SENTIMENT ANALYSIS FUNCTION ENDS ############
+
+
 
 
 if dashboard == 'Section 1: Employee Experience':
 
     
-    @st.cache(allow_output_mutation=True)
-    def get_sentiment_analyzer():
-        return pipeline("sentiment-analysis")
+    
     
     filtered_data = apply_filters(data, st.session_state['selected_role'], st.session_state['selected_function'],
                                   st.session_state['selected_location'])
@@ -357,6 +380,8 @@ if dashboard == 'Section 1: Employee Experience':
         st.plotly_chart(fig_function2, use_container_width=True, key="functions_bar_chart2")
     
     # Question 9: Which reason(s) drive that score ?
+    st.title("Sentiment Analysis App")
+
     # Display the reasons for communication channel satisfaction
     st.markdown('<h1 style="font-size:17px;font-family:Arial;color:#333333;">The Reasons for Ratings on Communication Channels</h1>', unsafe_allow_html=True)
 
@@ -368,31 +393,18 @@ if dashboard == 'Section 1: Employee Experience':
         st.markdown("<h1 style='text-align: center; font-size: 24px; font-weight: normal;'>Word Cloud Visualization</h1>", unsafe_allow_html=True)
         generate_wordclouds(filtered_data, 13, 14, communication_stopwords)
 
-    sentiment_analyzer = get_sentiment_analyzer()
-    
-    kw_model = KeyBERT()
 
-    st.title("Sentiment Analysis App")
-    
-    def get_transformer_sentiment(text):
-        result = sentiment_analyzer(text)[0]
-        return result['score'] if result['label'] == 'POSITIVE' else -result['score']
-    
-    # Function to extract keywords using KeyBERT
-    def extract_keywords(text):
-        keywords = kw_model.extract_keywords(text, keyphrase_ngram_range=(1, 3), stop_words='english', use_maxsum=True, nr_candidates=20, top_n=5)
-        return ', '.join([word for word, _ in keywords])
+    column_index = 14  # replace with your column index
+    filtered_data = apply_sentiment_analysis(filtered_data, column_index, sentiment_analyzer)
 
-    # Apply transformer-based sentiment analysis to each text in the DataFrame
-    filtered_data['Communication_Sentiment_Score1'] = filtered_data.iloc[:, 14].apply(get_transformer_sentiment)
 
     # Identify top 5 positive and negative texts
     top_5_positive = filtered_data.nlargest(5, 'Communication_Sentiment_Score1')
     top_5_negative = filtered_data.nsmallest(5, 'Communication_Sentiment_Score1')
 
     # Extract keywords for top 5 positive and negative texts
-    top_5_positive['Key Phrases'] = top_5_positive.iloc[:, 14].apply(extract_keywords)
-    top_5_negative['Key Phrases'] = top_5_negative.iloc[:, 14].apply(extract_keywords)
+    top_5_positive['Key Phrases'] = extract_keywords_from_df(top_5_positive, 14, kw_model)
+    top_5_negative['Key Phrases'] = extract_keywords_from_df(top_5_negative, 14, kw_model)
 
     # Columns to display
     columns_to_display1 = ['From 1 to 5, how satisfied are you with the communication channels used to relay important HR information to employees?', 'Key Phrases']
