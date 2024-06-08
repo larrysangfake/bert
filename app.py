@@ -10,8 +10,7 @@ import os
 from keybert import KeyBERT
 import plotly.express as px
 import matplotlib.pyplot as plt
-import spacy
-import benepar
+
 
 
 
@@ -695,63 +694,24 @@ if dashboard == 'Section 4: Learning':
     # Display the improvement/missing format for learning management system
     st.markdown('<h1 style="font-size:17px;font-family:Arial;color:#333333;">the improvement/missing format for learning management system</h1>', unsafe_allow_html=True)
 
+    #Extract key phrases from the text
+    learning_stopwords = ["learning", "management", "system", "employees", "company", "help", "need", "everyone", "makes", "improved", "improvement", "missing", "format", "today"]
 
+    improvement_and_missing = filtered_data.iloc[:, 35]
+    improvement_and_missing = improvement_and_missing.dropna()
 
+    #join all the text into one string
+    text = ' '.join(improvement_and_missing.astype(str))
 
-    # Function to download and load models
-    def load_models():
-        try:
-            nlp = spacy.load("en_core_web_sm")
-        except OSError:
-            from spacy.cli import download
-            download("en_core_web_sm")
-            nlp = spacy.load("en_core_web_sm")
-        
-        if not benepar.BeneparComponent.has_pipe("benepar"):
-            benepar.download("benepar_en3")
-        nlp.add_pipe("benepar", config={"model": "benepar_en3"})
-        return nlp
+    #generate the word_cloud
+    wordcloud = WordCloud(width=800, height=400, background_color='white', stopwords=learning_stopwords, collocations=False).generate(text)
 
-    st.write("Loading models...")
-    nlp = load_models()
-    st.write("Models loaded.")
+    # Display the word cloud
+    fig2, ax = plt.subplots(figsize=(10, 5))
+    ax.imshow(wordcloud, interpolation='bilinear')
+    ax.axis('off')
+    st.pyplot(fig2)
 
-    def extract_labels(tree, label):
-        if tree.label() == label:
-            yield tree
-        for child in tree:
-            if isinstance(child, benepar.base.BaseTree):
-                yield from extract_labels(child, label)
-
-    st.title("Constituency Parsing with spaCy and benepar")
-    sentence = st.text_input("Enter a sentence:", "I know that she is coming.")
-    st.write("Waiting for sentence input...")
-    sentence = st.text_input("Enter a sentence:", "I know that she is coming.")
-    st.write(f"Received sentence: {sentence}")
-
-    if sentence:
-        doc = nlp(sentence)
-        st.write("### Parsed Sentence:")
-        st.write([sent.text for sent in doc.sents])
-        
-        for sent in doc.sents:
-            parse_tree = sent._.parse_string
-            st.write("### Parse Tree:")
-            st.write(parse_tree)
-            tree = benepar.Tree.fromstring(parse_tree)
-
-            sbar_phrases = list(extract_labels(tree, 'SBAR'))
-            np_phrases = list(extract_labels(tree, 'NP'))
-
-            st.write("### SBAR components:")
-            for sbar in sbar_phrases:
-                leaves = ' '.join(sbar.leaves())
-                st.write(leaves)
-
-            st.write("### NP components:")
-            for np in np_phrases:
-                leaves = ' '.join(np.leaves())
-                st.write(leaves)
 
 
 
