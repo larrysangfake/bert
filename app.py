@@ -713,17 +713,21 @@ if dashboard == 'Section 4: Learning':
     st.pyplot(fig2)
 
     def extract_keyphrases(text):
-        keywords = kw_model.extract_keywords(text, keyphrase_ngram_range=(2, 10), stop_words='english', use_maxsum=True, nr_candidates=20, top_n=5)
+        keywords = kw_model.extract_keywords(text, keyphrase_ngram_range=(2, 10), stop_words='english', use_maxsum=True, nr_candidates=20, top_n=2)
         return ', '.join([word for word, _ in keywords])
 
     #extract keywords from the text
     improvement_and_missing_keywords = improvement_and_missing.apply(extract_keyphrases)
 
-    #check the phrases
-    st.table(improvement_and_missing_keywords.head(5))
+
 
     #list every keyphrase from every row
     improvement_and_missing_keywords = improvement_and_missing_keywords.str.split(',').explode()
+    
+    #check the phrases
+    st.table(improvement_and_missing_keywords.head(5))
+
+
 
     #generate the word_cloud
     wordcloud = WordCloud(width=800, height=400, background_color='white', stopwords=learning_stopwords, collocations=False).generate(' '.join(improvement_and_missing_keywords))
