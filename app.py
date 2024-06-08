@@ -579,7 +579,7 @@ if dashboard == 'Section 3: Performance & Talent':
         filtered_data) * 100
 
     # Create a horizontal bar chart with Plotly
-    fig1 = px.bar(negative_reason_recruiting_counts, x='negative_reasons', y='percentage', text='count',
+    fig1 = px.bar(negative_reason_recruiting_counts, y='negative_reasons', x='percentage', text='count',
                   color='negative_reasons', color_discrete_sequence=['#FFA500'], orientation='h')
 
     # Customize the tooltip
@@ -693,7 +693,7 @@ if dashboard == 'Section 4: Learning':
     # Display the improvement/missing format for learning management system
     st.markdown('<h1 style="font-size:17px;font-family:Arial;color:#333333;">the improvement/missing format for learning management system</h1>', unsafe_allow_html=True)
 
-    
+
 
     
 
