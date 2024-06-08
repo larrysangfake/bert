@@ -396,6 +396,7 @@ if dashboard == 'Section 1: Employee Experience':
 
     column_index = 14  # replace with your column index
     filtered_data = apply_sentiment_analysis(filtered_data, column_index, sentiment_analyzer)
+    st.table(filtered_data.head(5))
 
 
     # Identify top 5 positive and negative texts
