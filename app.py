@@ -734,22 +734,6 @@ if dashboard == 'Section 4: Learning':
     st.title('Phrase Cloud')
     st.image(phrase_cloud.to_array(), use_column_width=True)
 
-    # Sample data (replace this with your actual data)
-    data = {
-        'text': [
-            "like coaching, like coaching options, coaching options",
-            "allows employees create personalized learning paths based roles, create personalized learning paths, implement allows employees create personalized learning paths based",
-            "online courses workshops seminars mentorship programs job training caters, offer variety learning formats online courses, learning formats online courses workshops seminars",
-            "gather insights employees learning experiences involve surveys focus groups discussions, establish regular feedback loops gather insights employees, gather insights employees learning experiences",
-            "maybe focus training, training need general, compulsory training sessions",
-            "think smaller, site sessions, groups site",
-            "long focused, focused job, onboarding training",
-            "develop site, site trainings, develop site trainings"
-        ]
-    }
-
-    # Convert data to DataFrame
-    df = pd.DataFrame(data)
 
     # Function to split and list phrases
     def list_phrases(dataframe, column_name):
@@ -760,13 +744,13 @@ if dashboard == 'Section 4: Learning':
         return phrases
 
     # List phrases in the DataFrame
-    phrases = list_phrases(df, 'text')
+    phrases = list_phrases(improvement_and_missing_keywords, "What could be improved or what kind of format is missing today ?")
 
     # Convert to DataFrame and sort by phrase length
     phrases_df = pd.DataFrame(phrases, columns=['Phrase']).sort_values(by='Phrase', key=lambda x: x.str.len())
 
     # Display the phrase counts without index
-    st.write(phrases_df.to_html(index=False), unsafe_allow_html=True)
+    st.write(phrases_df(index=False), unsafe_allow_html=True)
 
     
 
