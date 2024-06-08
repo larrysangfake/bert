@@ -695,7 +695,7 @@ if dashboard == 'Section 4: Learning':
     st.markdown('<h1 style="font-size:17px;font-family:Arial;color:#333333;">the improvement/missing format for learning management system</h1>', unsafe_allow_html=True)
 
     #Extract key phrases from the text
-    learning_stopwords = ["learning", "management", "system", "employees", "company", "help", "need", "everyone", "makes", "improved", "improvement", "missing", "format", "today", "no", "and","should","more", "training"]
+    learning_stopwords = ["this", "a", "what", "on", "could", "do", "we", "their", "the", "learning", "management", "system", "employees", "company", "help", "need", "everyone", "makes", "improved", "improvement", "missing", "format", "today", "no", "and","should","more", "training"]
 
     improvement_and_missing = filtered_data.iloc[:, 35]
     improvement_and_missing = improvement_and_missing.dropna()
@@ -719,12 +719,13 @@ if dashboard == 'Section 4: Learning':
     #extract keywords from the text
     improvement_and_missing_keywords = improvement_and_missing.apply(extract_keyphrases)
 
+    #check the phrases
+    st.table(improvement_and_missing_keywords.head(5))
+
     #list every keyphrase from every row
     improvement_and_missing_keywords = improvement_and_missing_keywords.str.split(',').explode()
 
-    #display word cloud from the keyphrases
-    improvement_and_missing_keywords = improvement_and_missing_keywords.str.strip()
-    improvement_and_missing_keywords = improvement_and_missing_keywords[improvement_and_missing_keywords != '']
+    #generate the word_cloud
     wordcloud = WordCloud(width=800, height=400, background_color='white', stopwords=learning_stopwords, collocations=False).generate(' '.join(improvement_and_missing_keywords))
 
     #count frequency of each keyphrase
