@@ -751,27 +751,24 @@ if dashboard == 'Section 4: Learning':
     # Convert data to DataFrame
     df = pd.DataFrame(data)
 
-    # Function to split and count phrases
-    def count_phrases(dataframe, column_name):
+    # Function to split and list phrases
+    def list_phrases(dataframe, column_name):
         phrases = []
         for row in dataframe[column_name]:
             if pd.notna(row):
                 phrases.extend([phrase.strip() for phrase in row.split(',')])
-        phrase_counts = Counter(phrases)
-        return phrase_counts
+        return phrases
 
-    # Count phrases in the DataFrame
-    phrase_counts = count_phrases(df, 'text')
+    # List phrases in the DataFrame
+    phrases = list_phrases(df, 'text')
 
-    # Convert the Counter object to a DataFrame for better visualization
-    phrase_counts_df = pd.DataFrame(phrase_counts.items(), columns=['Phrase', 'Frequency']).sort_values(by='Frequency', ascending=False)
+    # Convert to DataFrame and sort by phrase length
+    phrases_df = pd.DataFrame(phrases, columns=['Phrase']).sort_values(by='Phrase', key=lambda x: x.str.len())
 
-    # Display the phrase counts
-    print(phrase_counts_df)
+    # Display the phrase counts without index
+    st.write(phrases_df.to_html(index=False), unsafe_allow_html=True)
 
-    # If you are using Streamlit, you can display the DataFrame as follows:
-    st.write(phrase_counts_df)
-
+    
 
     
     #check the phrases
