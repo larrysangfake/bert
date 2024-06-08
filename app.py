@@ -751,8 +751,8 @@ if dashboard == 'Section 4: Learning':
     # Convert to DataFrame and sort by phrase length
     phrases_df = pd.DataFrame(phrases, columns=['Key Reasons']).sort_values(by='Key Reasons', key=lambda x: x.str.len())
     
-    phrases_df.dropna(inplace=True)
-    
+    phrases_df = phrases_df[phrases_df['Key Reasons'].str.strip() != '']
+
     # Display the phrase counts without index
     st.write(phrases_df.reset_index(drop=True))
 
