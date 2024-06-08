@@ -10,6 +10,8 @@ import os
 from keybert import KeyBERT
 import plotly.express as px
 import matplotlib.pyplot as plt
+import spacy
+import benepar
 
 
 
@@ -692,6 +694,49 @@ if dashboard == 'Section 4: Learning':
 
     # Display the improvement/missing format for learning management system
     st.markdown('<h1 style="font-size:17px;font-family:Arial;color:#333333;">the improvement/missing format for learning management system</h1>', unsafe_allow_html=True)
+
+    
+    # Load spaCy and benepar model
+    @st.cache(allow_output_mutation=True)
+    def load_models():
+        nlp = spacy.load("en_core_web_sm")
+        if not benepar.BeneparComponent.has_pipe("benepar"):
+            benepar.download("benepar_en3")
+        nlp.add_pipe("benepar", config={"model": "benepar_en3"})
+        return nlp
+
+    nlp = load_models()
+
+    def extract_labels(tree, label):
+        if tree.label() == label:
+            yield tree
+        for child in tree:
+            if isinstance(child, benepar.base.BaseTree):
+                yield from extract_labels(child, label)
+
+    st.title("Constituency Parsing with spaCy and benepar")
+    sentence = st.text_input("Enter a sentence:", "I know that she is coming.")
+
+    if sentence:
+        doc = nlp(sentence)
+
+        for sent in doc.sents:
+            parse_tree = sent._.parse_string
+            tree = benepar.Tree.fromstring(parse_tree)
+
+            sbar_phrases = list(extract_labels(tree, 'SBAR'))
+            np_phrases = list(extract_labels(tree, 'NP'))
+
+            st.write("### SBAR components:")
+            for sbar in sbar_phrases:
+                leaves = ' '.join(sbar.leaves())
+                st.write(leaves)
+
+            st.write("### NP components:")
+            for np in np_phrases:
+                leaves = ' '.join(np.leaves())
+                st.write(leaves)
+
 
 
 
