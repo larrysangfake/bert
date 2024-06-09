@@ -1560,10 +1560,16 @@ if dashboard == "Section 8: User Experience":
     overall_experience = filtered_data.iloc[:, 72]
 
     # Function to extract bigrams from text
-    def extract_bigrams3(text):
-        tokens = nltk.word_tokenize(text)
-        bigrams = list(ngrams(tokens, 2))
-        return [' '.join(bigram) for bigram in bigrams]
+    def extract_bigrams3(x):
+        bigrams = []
+        # Split the phrases by comma and space
+        phrases = x.split(', ')
+        for phrase in phrases:
+            # Split the phrase into words
+            words = phrase.split(' ')
+            # Generate bigrams for the words
+            bigrams.extend(list(ngrams(words, 2)))
+        return bigrams
     
     #drop missing values first
     overall_experience = overall_experience.dropna()
