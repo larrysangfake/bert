@@ -45,18 +45,15 @@ def reset_filters():
 st.set_page_config(layout="wide")
 initialize_state()
 
+# Add a file uploader to the sidebar
+uploaded_file = st.sidebar.file_uploader("Choose a file")
+st.session_state['uploaded_file'] = uploaded_file
 
 # Load and clean data
 @st.cache_data(persist=True)
-
-
 def load_data():
-    # Add a file uploader to the sidebar
-    uploaded_file = st.sidebar.file_uploader("Choose a file")
-
-
-    if uploaded_file is not None:
-        data = pd.read_excel(uploaded_file)
+    if st.session_state['uploaded_file'] is not None:
+        data = pd.read_excel(st.session_state['uploaded_file'])
     else:
         url = 'https://github.com/001202ZHENG/V1_Chatbot_Streamlit/raw/main/data/Voice%20of%20Customer_Second%20data%20set.xlsx'
         data = pd.read_excel(url)
