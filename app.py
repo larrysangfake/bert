@@ -1658,82 +1658,88 @@ if dashboard == "Section 8: User Experience":
     #count the number of positive, negative and neutral sentiments
     sentiment_count = filtered_data['star rating'].value_counts()
 
-    #create a horinzontal bar chart
-    sentiment_ratio = 0.6
+    # Display the sentiment count   
+    # A text container for filtering instructions
+    st.markdown(
+        f"""
+        <div class="text-container" style="font-style: italic;">
+        Filter the data by selecting tags from the sidebar. The charts below will be updated to reflect the&nbsp;
+        <strong>{len(filtered_data)}</strong>&nbsp;filtered respondents.
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    satisfaction_ratio = 0.6
     barcharts_ratio = 1 - satisfaction_ratio
     satisfaction_col, barcharts_col = st.columns([satisfaction_ratio, barcharts_ratio])
-
-    st.markdown("""
-        <style>
-        .chart-container {
-            padding-top: 20px;
-        }
-        </style>
-        """, unsafe_allow_html=True)
     
     with satisfaction_col:
         st.markdown('<div class="chart-container">', unsafe_allow_html=True)
-        categories = ['Positive', 'Neutral', 'Negative']
-        
+        categories = ['Very Dissatisfied', 'Dissatisfied', 'Neutral', 'Satisfied', 'Very Satisfied']
+        c73ValuesCount, c73MedianScore = score_distribution(filtered_data, 73)
 
-        sentiment_df = pd.DataFrame({'Sentiment Level': categories, 'Count': sentiment_count.values})
+        ratings_df = pd.DataFrame({'Satisfaction Level': categories, 'Percentage': c73ValuesCount.values})
 
-        # Display title
-        title_html = f"<h2 style='font-size: 17px; font-family: Arial; color: #333333;'>Sentiment Analysis</h2>"
+        # Display title and median score
+        title_html = f"<h2 style='font-size: 17px; font-family: Arial; color: #333333;'>Star Rating Prediction on User Experience</h2>"
+        caption_html = f"<div style='font-size: 15px; font-family: Arial; color: #707070;'>The median satisfaction score is {c73MedianScore:.1f}</div>"
         st.markdown(title_html, unsafe_allow_html=True)
+        st.markdown(caption_html, unsafe_allow_html=True)
 
         # Create a horizontal bar chart with Plotly
-        fig = px.bar(sentiment_df, y='Sentiment Level', x='Count', text='Count',
+        fig = px.bar(ratings_df, y='Satisfaction Level', x='Percentage', text='Percentage',
                      orientation='h',
-                     color='Sentiment Level', color_discrete_map={
-                'Positive': '#5ec962',  # Light green
+                     color='Satisfaction Level', color_discrete_map={
+                'Very Dissatisfied': '#440154',  # Dark purple
+                'Dissatisfied': '#3b528b',  # Dark blue
                 'Neutral': '#21918c',  # Cyan
-                'Negative': '#3b528b'  # Dark blue
+                'Satisfied': '#5ec962',  # Light green
+                'Very Satisfied': '#fde725'  # Bright yellow
             })
 
         # Remove legend and axes titles
         fig.update_layout(showlegend=False, xaxis_visible=False, xaxis_title=None, yaxis_title=None, autosize=True,
                           height=300, margin=dict(l=20, r=20, t=30, b=20))
+        fig.update_xaxes(range=[0, max(ratings_df['Percentage']) * 1.1])
 
         # Format text on bars
-        fig.update_traces(texttemplate='%{x}', textposition='outside')
-        fig.update_xaxes(range=[0, max(sentiment_df['Count']) * 1.1])
+        fig.update_traces(texttemplate='%{x:.1f}%', textposition='outside')
 
         # Improve layout aesthetics
         fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide')
 
         # Use Streamlit to display the Plotly chart
-        st.plotly_chart(fig, use_container_width=True, key="sentiment_bar_chart")
+        st.plotly_chart(fig, use_container_width=True, key="rating_on_user_experience_bar_chart")
         st.markdown('</div>', unsafe_allow_html=True)
 
     with barcharts_col:
-        sentiment_options = ['Select a sentiment level', 'Positive', 'Neutral', 'Negative']
-        sentiment_dropdown = st.selectbox('', sentiment_options,
-                                              key='sentiment_dropdown')
+        satisfaction_dropdown2 = st.selectbox('', satisfaction_options,
+                                              key='satisfaction_dropdown2')
 
-        sentiment_filtered_data = filter_by_sentiment(overall_experience, sentiment_dropdown)
+        satisfaction_filtered_data2 = filter_by_satisfaction(filtered_data, satisfaction_dropdown2, 73)
 
-        location_summary, role_summary, function_summary = prepare_summaries(sentiment_filtered_data)
+        location_summary2, role_summary2, function_summary2 = prepare_summaries(satisfaction_filtered_data2)
         left_margin = 150
         total_height = 310
         role_chart_height = total_height * 0.45
         function_chart_height = total_height * 0.55
 
-        fig_role = px.bar(role_summary, y='Role', x='Count', orientation='h')
-        fig_role.update_layout(title="by Role", margin=dict(l=left_margin, r=0, t=50, b=0),
+        fig_role2 = px.bar(role_summary2, y='Role', x='Count', orientation='h')
+        fig_role2.update_layout(title="by Role", margin=dict(l=left_margin, r=0, t=50, b=0),
                                 height=role_chart_height, showlegend=False)
-        fig_role.update_traces(marker_color='#336699', text=role_summary['Count'], textposition='outside')
-        fig_role.update_yaxes(showticklabels=True, title='')
-        fig_role.update_xaxes(showticklabels=False, title='')
-        st.plotly_chart(fig_role, use_container_width=True, key="roles_bar_chart")
+        fig_role2.update_traces(marker_color='#336699', text=role_summary2['Count'], textposition='outside')
+        fig_role2.update_yaxes(showticklabels=True, title='')
+        fig_role2.update_xaxes(showticklabels=False, title='')
+        st.plotly_chart(fig_role2, use_container_width=True, key="roles_bar_chart2")
 
-        fig_function = px.bar(function_summary, y='Function', x='Count', orientation='h')
-        fig_function.update_layout(title="by Function", margin=dict(l=left_margin, r=0, t=50, b=0),
+        fig_function2 = px.bar(function_summary2, y='Function', x='Count', orientation='h')
+        fig_function2.update_layout(title="by Function", margin=dict(l=left_margin, r=0, t=50, b=0),
                                     height=function_chart_height, showlegend=False)
-        fig_function.update_traces(marker_color='#336699', text=function_summary['Count'], textposition='outside')
-        fig_function.update_yaxes(showticklabels=True, title='')
-        fig_function.update_xaxes(showticklabels=False, title='')
-        st.plotly_chart(fig_function, use_container_width=True, key="functions_bar_chart")
+        fig_function2.update_traces(marker_color='#336699', text=function_summary2['Count'], textposition='outside')
+        fig_function2.update_yaxes(showticklabels=True, title='')
+        fig_function2.update_xaxes(showticklabels=False, title='')
+        st.plotly_chart(fig_function2, use_container_width=True, key="functions_bar_chart2")
 
 
 
