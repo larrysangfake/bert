@@ -423,6 +423,48 @@ if dashboard == 'Section 1: Employee Experience':
     # Columns to display
     columns_to_display2 = ['From 1 to 5, how satisfied are you with the communication channels used to relay important HR information to employees?', 'Which reason(s) drive that score ?']
 
+    overall_experience = filtered_data.iloc[:, 14]
+
+    #set the stopwords
+    Overall_stopwords = [",", ";", " ;", "; ", "not very", "not", "very", " ; ", "I", "my", "activities", "fail", "address", "missing", "HRIS", "valuable", "system", "HR", "current", "functionalities", "system", "payroll", "compensation", "miss", "missing", "this","about", "of", ",", "to", "a", "what", "on", "could", "do", "we", "their", "the", "learning", "management", "system", "employees", "company", "system", "like", "choose", "help", "need", "everyone", "makes", "improved", "improvement", "format", "today", "no", "and","should","more", "training", "data", "according", "you"]
+
+    # Function to extract n-grams from text
+    def extract_ngrams(x, n):
+        ngrams = []
+        phrases = x.split(', ')
+        for phrase in phrases:
+            words = phrase.split(' ')
+            ngrams.extend([' '.join(ng) for ng in nltk_ngrams(words, n)])
+        return ngrams
+
+    #drop missing values first
+    overall_experience = overall_experience.dropna()
+
+    # Concatenate all text data
+    overall_text = ' '.join(overall_experience.astype(str))
+
+    # Generate unigrams, bigrams, and trigrams
+    unigrams_overall = extract_ngrams(overall_text, 1)
+    bigrams_overall = extract_ngrams(overall_text, 2)
+    trigrams_overall = extract_ngrams(overall_text, 3)
+
+    # Count the frequency of each n-gram
+    unigram_freq_overall = Counter(unigrams_overall)
+    bigram_freq_overall = Counter(bigrams_overall)
+    trigram_freq_overall = Counter(trigrams_overall)
+
+    # Combine the frequencies
+    combined_freq_overall = unigram_freq_overall + bigram_freq_overall + trigram_freq_overall
+
+    # Generate the word cloud
+    phrase_cloud_overall = WordCloud(width=800, height=400, background_color='white', stopwords = Overall_stopwords).generate_from_frequencies(combined_freq_overall)
+
+    # Display the word cloud using Streamlit
+    st.markdown(
+            "<h3 style='text-align: center; font-size: 20px; font-weight: normal;'>Word Cloud</h3>",
+            unsafe_allow_html=True)
+    st.image(phrase_cloud_overall.to_array(), use_column_width=True)
+
     # Display tables in Streamlit
     st.write("Top 5 Positive Key Phrases")
     st.table(top_5_positive[columns_to_display1])
