@@ -1232,7 +1232,7 @@ if dashboard == 'Section 6: Payroll':
     #################stay only in this dashboard end##################
     
     st.markdown(
-        "<h3 style='text-align: center; font-size: 20px; font-weight: normal;'>All specific features of the current system that people like/that made people choose it</h3>",
+        "<h3 style='text-align: left; font-size: 20px; font-weight: normal;'>All specific features of the current system that people like/that made people choose it</h3>",
         unsafe_allow_html=True)
     st.write(specific_features)
 
