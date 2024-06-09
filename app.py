@@ -143,6 +143,9 @@ roles = get_unique_values('What is your role at the company ?')
 functions = get_unique_values('What function are you part of ?')
 locations = get_unique_values('Where are you located ?')
 
+st.sidebar.markdown('For complete survey dashboard, please check out the [link](https://v1chatbotapp-2syadnkccp6nyevahkmkbm.streamlit.app)')
+
+
 st.sidebar.multiselect('Select Role', options=roles, default=st.session_state['selected_role'], key='selected_role')
 st.sidebar.multiselect('Select Function', options=functions, default=st.session_state['selected_function'],
                        key='selected_function')
@@ -304,7 +307,7 @@ kw_model = load_keyword_extractor()
 
 
 
-
+############ SECTION 1 STARTS ############
 if dashboard == 'Section 1: Employee Experience':
     # Apply filters to the data    
     filtered_data = apply_filters(data, st.session_state['selected_role'], st.session_state['selected_function'],
@@ -405,6 +408,7 @@ if dashboard == 'Section 1: Employee Experience':
         st.markdown("<h1 style='text-align: center; font-size: 24px; font-weight: normal;'>Word Cloud Visualization</h1>", unsafe_allow_html=True)
         generate_wordclouds(filtered_data, 13, 14, communication_stopwords)
 
+    #################stay only in this dashboard start##################
     # Apply transformer-based sentiment analysis to each text in the DataFrame
     filtered_data['Communication_Sentiment_Score1'] = filtered_data.iloc[:, 14].apply(get_transformer_sentiment)
 
@@ -423,54 +427,29 @@ if dashboard == 'Section 1: Employee Experience':
     # Columns to display
     columns_to_display2 = ['From 1 to 5, how satisfied are you with the communication channels used to relay important HR information to employees?', 'Which reason(s) drive that score ?']
 
-    overall_experience = filtered_data.iloc[:, 14]
-
-    # Set the stopwords
-    Overall_stopwords = [",", ";", " ;", "; ", "not very", "not", "very", " ; ", "I", "my", "activities", "fail", "address", "missing", "HRIS", "valuable", "system", "HR", "current", "functionalities", "system", "payroll", "compensation", "miss", "missing", "this","about", "of", ",", "to", "a", "what", "on", "could", "do", "we", "their", "the", "learning", "management", "system", "employees", "company", "system", "like", "choose", "help", "need", "everyone", "makes", "improved", "improvement", "format", "today", "no", "and","should","more", "training", "data", "according", "you"]
-
-    # Function to extract bigrams from text
-    def extract_bigrams(x):
-        bigrams = []
-        phrases = x.split(', ')
-        for phrase in phrases:
-            words = phrase.split(' ')
-            bigrams.extend([' '.join(ng) for ng in nltk_ngrams(words, 2)])
-        return bigrams
-
-    # Drop missing values first
-    overall_experience = overall_experience.dropna()
-
-    # Concatenate all text data
-    overall_text = ' '.join(overall_experience.astype(str))
-
-    # Generate bigrams
-    bigrams_overall = extract_bigrams(overall_text)
-
-    # Count the frequency of each bigram
-    bigram_freq_overall = Counter(bigrams_overall)
-
-    # Generate the word cloud
-    phrase_cloud_overall = WordCloud(width=800, height=400, background_color='white', stopwords=Overall_stopwords).generate_from_frequencies(bigram_freq_overall)
-
-    # Display the word cloud using Streamlit
-    st.markdown(
-            "<h3 style='text-align: center; font-size: 20px; font-weight: normal;'>Word Cloud</h3>",
-            unsafe_allow_html=True)
-    st.image(phrase_cloud_overall.to_array(), use_column_width=True)
 
     # Display tables in Streamlit
-    st.write("Top 5 Positive Key Phrases")
-    st.table(top_5_positive[columns_to_display1])
+    show_positive_key_phrases = st.checkbox("Show Top 5 Positive Key Phrases")
+    if show_positive_key_phrases:
+        st.table(top_5_positive[columns_to_display1])
 
-    st.write("Top 5 Negative Key Phrases")
-    st.table(top_5_negative[columns_to_display1])
+    show_negative_key_phrases = st.checkbox("Show Top 5 Negative Key Phrases")
+    if show_negative_key_phrases:
+        st.table(top_5_negative[columns_to_display1])
+    
+    show_positive_responses = st.checkbox("Show Top 5 Positive Responses")
+    if show_positive_responses:
+        st.table(top_5_positive[columns_to_display2])
+    
+    show_negative_responses = st.checkbox("Show Top 5 Negative Responses")
+    if show_negative_responses:
+        st.table(top_5_negative[columns_to_display2])
+    #################stay only in this dashboard end##################
+    
+############ SECTION 1 ENDS ############
 
-    st.write("Top 5 Positive Responses")
-    st.table(top_5_positive[columns_to_display2])
 
-    st.write("Top 5 Negative Responses")
-    st.table(top_5_negative[columns_to_display2])
-
+############ SECTION 3 STARTS ############
 if dashboard == 'Section 3: Performance & Talent':
     # Apply filters to the data
     filtered_data = apply_filters(data, st.session_state['selected_role'], st.session_state['selected_function'],
@@ -582,7 +561,8 @@ if dashboard == 'Section 3: Performance & Talent':
     if __name__ == "__main__":
         st.markdown("<h1 style='text-align: center; font-size: 24px; font-weight: normal;'>Word Cloud Visualization</h1>", unsafe_allow_html=True)
         generate_wordclouds(filtered_data, 26, 27, performance_stopwords)
-    
+
+    #################stay only in this dashboard start##################
     # Apply transformer-based sentiment analysis to each text in the DataFrame
     filtered_data['Performance_Sentiment_Score1'] = filtered_data.iloc[:, 27].apply(get_transformer_sentiment)
 
@@ -601,18 +581,24 @@ if dashboard == 'Section 3: Performance & Talent':
     columns_to_display2 = ['From 1 to 5, how satisfied are you with the company\'s performance evaluation and feedback process ?', 'Which reason(s) drive that score ?2']
 
     # Display tables in Streamlit
-    st.write("Top 5 Positive Key Phrases")
-    st.table(top_5_positive[columns_to_display1])
+    show_positive_key_phrases = st.checkbox("Show Top 5 Positive Key Phrases")
+    if show_positive_key_phrases:
+        st.table(top_5_positive[columns_to_display1])
+    
+    show_negative_key_phrases = st.checkbox("Show Top 5 Negative Key Phrases")
+    if show_negative_key_phrases:
+        st.table(top_5_negative[columns_to_display1])
+    
+    show_positive_responses = st.checkbox("Show Top 5 Positive Responses")
+    if show_positive_responses:
+        st.table(top_5_positive[columns_to_display2])
 
-    st.write("Top 5 Negative Key Phrases")
-    st.table(top_5_negative[columns_to_display1])
-
-    st.write("Top 5 Positive Responses")
-    st.table(top_5_positive[columns_to_display2])
-
-    st.write("Top 5 Negative Responses")
-    st.table(top_5_negative[columns_to_display2])
-
+    show_negative_responses = st.checkbox("Show Top 5 Negative Responses")
+    if show_negative_responses:
+        st.table(top_5_negative[columns_to_display2])
+    
+    #################stay only in this dashboard end##################
+    
     st.markdown(
     """
     <h2 style='font-size: 17px; font-family: Arial; color: #333333;'>
@@ -644,6 +630,9 @@ if dashboard == 'Section 3: Performance & Talent':
     # Show the chart
     st.plotly_chart(fig1, use_container_width=False)
 
+############ SECTION 3 ENDS ############
+
+############ SECTION 4 STARTS ############
 if dashboard == 'Section 4: Learning':
     filtered_data = apply_filters(data, st.session_state['selected_role'], st.session_state['selected_function'],
                                   st.session_state['selected_location'])
@@ -743,6 +732,7 @@ if dashboard == 'Section 4: Learning':
         fig_function1.update_xaxes(showticklabels=False, title='')
         st.plotly_chart(fig_function1, use_container_width=True, key="functions_bar_chart1")
 
+
     ### Column 35: What could be improved or what kind of format is missing today ?
 
     # Display the improvement/missing format for learning management system
@@ -754,8 +744,7 @@ if dashboard == 'Section 4: Learning':
     improvement_and_missing = filtered_data.iloc[:, 35]
     improvement_and_missing = improvement_and_missing.dropna()
 
-
-
+    #################stay only in this dashboard start##################
     def extract_keyphrases(text):
         keywords = kw_model.extract_keywords(text, keyphrase_ngram_range=(2, 10), stop_words='english', use_maxsum=True, nr_candidates=20, top_n=3)
         return ', '.join([word for word, _ in keywords])
@@ -815,7 +804,11 @@ if dashboard == 'Section 4: Learning':
     b64 = base64.b64encode(csv.encode()).decode()  # some strings <-> bytes conversions necessary here
     href = f'<a href="data:file/csv;base64,{b64}" download="improvement_missing.csv">Download improvement_missing csv file</a>'
     st.markdown(href, unsafe_allow_html=True)
+    #################stay only in this dashboard end##################
 
+############ SECTION 4 ENDS ############
+
+############ SECTION 5 STARTS ############
 if dashboard == 'Section 5: Compensation':
     filtered_data = apply_filters(data, st.session_state['selected_role'], st.session_state['selected_function'],
                                   st.session_state['selected_location'])
@@ -950,7 +943,7 @@ if dashboard == 'Section 5: Compensation':
 
 
     # Display the Data Missing for Compensation
-    st.markdown('<h1 style="font-size:17px;font-family:Arial;color:#333333;">the improvement/missing format for learning management system</h1>', unsafe_allow_html=True)
+    st.markdown('<h1 style="font-size:17px;font-family:Arial;color:#333333;">Data Missing for Compensation</h1>', unsafe_allow_html=True)
 
     #stopwords for data missing for compensation
     compensation_stopwords = ["compensation", "miss", "missing", "this","about", "of", ",", "to", "a", "what", "on", "could", "do", "we", "their", "the", "learning", "management", "system", "employees", "company", "help", "need", "everyone", "makes", "improved", "improvement", "format", "today", "no", "and","should","more", "training", "data", "according", "you"]
@@ -958,7 +951,20 @@ if dashboard == 'Section 5: Compensation':
     data_missing = filtered_data.iloc[:, 38]
     data_missing = data_missing.dropna()
 
+    #generate all text for word cloud for data missing
+    data_missing_text = ' '.join(data_missing.astype(str))
     
+    #generate simple word cloud for data missing
+    wordcloud = WordCloud(width=800, height=400, background_color='white', stopwords=compensation_stopwords).generate(data_missing_text)
+
+    # Display the word cloud using Streamlit
+    st.markdown(
+        "<h3 style='text-align: center; font-size: 20px; font-weight: normal;'>Word Cloud</h3>"
+    )
+    st.image(wordcloud.to_array(), use_column_width=True)
+    
+    #################stay only in this dashboard start##################
+    # Function to extract keyphrases from the text
     def extract_keyphrases(text):
         keywords = kw_model.extract_keywords(text, keyphrase_ngram_range=(2, 6), stop_words='english', use_maxsum=True, nr_candidates=20, top_n=2)
         return ', '.join([word for word, _ in keywords])
