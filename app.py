@@ -1651,11 +1651,12 @@ if dashboard == "Section 8: User Experience":
         else:
             return 'neutral'
 
-    filtered_data['sentiment_label'] = filtered_data.iloc[:, 72].apply(get_sentiment_label)
+    # Apply the function to the 72nd column
+    filtered_data['star_rating'] = filtered_data.iloc[:, 72].apply(lambda text: predict_star_rating(text, tokenizer, model))
     st.write(filtered_data)
 
     #count the number of positive, negative and neutral sentiments
-    sentiment_count = filtered_data['sentiment_label'].value_counts()
+    sentiment_count = filtered_data['star rating'].value_counts()
 
     #create a horinzontal bar chart
     sentiment_ratio = 0.6
