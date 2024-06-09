@@ -49,11 +49,12 @@ initialize_state()
 # Load and clean data
 @st.cache_data(persist=True)
 
-# Add a file uploader to the sidebar
-uploaded_file = st.sidebar.file_uploader("Choose a file")
-
 
 def load_data():
+    # Add a file uploader to the sidebar
+    uploaded_file = st.sidebar.file_uploader("Choose a file")
+
+
     if uploaded_file is not None:
         data = pd.read_excel(uploaded_file)
     else:
