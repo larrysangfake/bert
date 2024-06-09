@@ -744,6 +744,18 @@ if dashboard == 'Section 4: Learning':
     improvement_and_missing = filtered_data.iloc[:, 35]
     improvement_and_missing = improvement_and_missing.dropna()
 
+    #generate text for simple word cloud
+    improvement_and_missing_text = ' '.join(improvement_and_missing.astype(str))
+
+    #generate word cloud
+    improvement_and_missing_cloud = WordCloud(width=800, height=400, background_color='white', stopwords=learning_stopwords).generate(improvement_and_missing_text)
+
+    # Display the word cloud using Streamlit
+    st.markdown(
+            "<h3 style='text-align: center; font-size: 20px; font-weight: normal;'>Word Cloud</h3>",
+            unsafe_allow_html=True)
+    st.image(improvement_and_missing_cloud.to_array(), use_column_width=True)
+
     #################stay only in this dashboard start##################
     def extract_keyphrases(text):
         keywords = kw_model.extract_keywords(text, keyphrase_ngram_range=(2, 10), stop_words='english', use_maxsum=True, nr_candidates=20, top_n=3)
@@ -959,8 +971,8 @@ if dashboard == 'Section 5: Compensation':
 
     # Display the word cloud using Streamlit
     st.markdown(
-        "<h3 style='text-align: center; font-size: 20px; font-weight: normal;'>Word Cloud</h3>"
-    )
+            "<h3 style='text-align: center; font-size: 20px; font-weight: normal;'>Word Cloud</h3>",
+            unsafe_allow_html=True)
     st.image(wordcloud.to_array(), use_column_width=True)
     
     #################stay only in this dashboard start##################
