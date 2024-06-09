@@ -114,7 +114,7 @@ def render_header(title, subtitle=None):
 
 
 # Sidebar for dashboard selection
-dashboard = st.sidebar.radio("Select Sentiment/Reason Analysis Dashboard", ('General Survey Results',
+dashboard = st.sidebar.radio("Select Sentiment/Reason Analysis Dashboard", (
                                                   'Section 1: Employee Experience',
                                                   'Section 2: Recruiting & Onboarding',
                                                   'Section 3: Performance & Talent',
@@ -158,9 +158,7 @@ def apply_filters(data, roles, functions, locations):
 
 
 # Use the function with both a title and a subtitle
-if dashboard == 'General Survey Results':
-    render_header("General Survey Results")
-elif dashboard == 'Section 1: Employee Experience':
+if dashboard == 'Section 1: Employee Experience':
     render_header("Employee Experience: General HR Services Evaluation")
 elif dashboard == 'Section 3: Performance & Talent':
     render_header("Performance & Talent")
