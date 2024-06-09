@@ -1,7 +1,7 @@
 import base64
 import streamlit as st
 import numpy as np
-from transformers import BertTokenizer, BertForSequenceClassification
+from transformers import BertTokenizer, BertForSequenceClassification, AutoTokenizer, AutoModelForSequenceClassification
 from transformers import pipeline
 import torch
 import pandas as pd
@@ -1600,16 +1600,33 @@ if dashboard == "Section 8: User Experience":
     #sentiment analysis for overall experience with the current HRIS
     st.write("In 3 words, how would you describe your experience with the current HRIS?")
 
-    def get_sentiment_label(text):
-        analyzer = sentiment_analyzer()
-        sentiment = analyzer.polarity_scores(text)
-        compound = sentiment['compound']
-        if compound >= 0.05:
-            return 'positive'
-        elif compound <= -0.05:
-            return 'negative'
+    
+    @st.cache(allow_output_mutation=True)
+    def load_model():
+        tokenizer = AutoTokenizer.from_pretrained("nlptown/bert-base-multilingual-uncased-sentiment")
+        model = AutoModelForSequenceClassification.from_pretrained("nlptown/bert-base-multilingual-uncased-sentiment")
+        return tokenizer, model
+
+    def predict_sentiment(text, tokenizer, model):
+        inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True, max_length=512)
+        outputs = model(**inputs)
+        probabilities = torch.nn.functional.softmax(outputs.logits, dim=-1)
+        star_rating = torch.argmax(probabilities, dim=1).item() + 1
+        return star_rating
+
+    # Load the model and tokenizer
+    tokenizer, model = load_model()
+
+    # Streamlit app layout
+    st.title("Text Sentiment Analysis with Star Rating")
+    user_input = st.text_area("Enter your text here:")
+    if st.button("Predict"):
+        if user_input:
+            star_rating = predict_sentiment(user_input, tokenizer, model)
+            st.write(f"The predicted star rating is: {star_rating} ⭐")
         else:
-            return 'neutral'
+            st.write("Please enter some text to analyze.")
+
 
     filtered_data['sentiment_label'] = filtered_data.iloc[:, 72].apply(get_sentiment_label)
     st.write(filtered_data)
