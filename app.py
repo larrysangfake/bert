@@ -1445,17 +1445,17 @@ if dashboard == "Section 8: User Experience":
     st.markdown(
     """
     <h2 style='font-size: 17px; font-family: Arial; color: #333333;'>
-    In the context of your job, what are the most valuable activities your current HRIS enable you to do?
+    In the context of employees' job, what are the most valuable activities the current HRIS enable them to do?
     </h2>
     """,
     unsafe_allow_html=True
     )
 
 
-    #Column 69: In the context of your job, what are the most valuable activities your current HRIS enable you to do?
+    
 
     # Display the most valuable activities in the current HRIS
-    st.markdown('<h1 style="font-size:17px;font-family:Arial;color:#333333;">Most Valuable Activities in the Current HRIS</h1>', unsafe_allow_html=True)
+    st.markdown("<div style='font-size: 15px; font-family: Arial; color: #707070;'>Most Valuable Activities in the Current HRIS</div>", unsafe_allow_html=True)
 
     #stopwords for most valuable activities in the current HRIS
     HRIS_stopwords = ["I","and" ," and", "and ", " ;", "; ", " to", " for", "for ", "for", "to ", "my", "activities", "HRIS", "valuable", "system", "HR", "current", "functionalities", "system", "payroll", "compensation", "miss", "missing", "this","about", "of", ",", "to", "a", "what", "on", "could", "do", "we", "their", "the", "learning", "management", "system", "employees", "company", "system", "like", "choose", "help", "need", "everyone", "makes", "improved", "improvement", "format", "today", "no", "and","should","more", "training", "data", "according", "you"]
@@ -1469,7 +1469,7 @@ if dashboard == "Section 8: User Experience":
     word_cloud_valuable = WordCloud(width=800, height=400, background_color='white', stopwords=HRIS_stopwords).generate(' '.join(valuable_activities.dropna().astype(str)))
 
     # Display the most valuable activities in the current HRIS
-    st.markdown('<h1 style="font-size:17px;font-family:Arial;color:#333333;">Wordcloud</h1>', unsafe_allow_html=True)
+    st.markdown("<div style='font-size: 15px; font-family: Arial; color: #707070;'>Word Cloud</div>", unsafe_allow_html=True)
     st.image(word_cloud_valuable.to_array(), use_column_width=True)
     
 
@@ -1496,47 +1496,13 @@ if dashboard == "Section 8: User Experience":
     # Count the frequency of each bigram
     bigram_freq_valuable = Counter(bigrams_valuable)
 
-    # Generate the word cloud
-    st.markdown('<h1 style="font-size:17px;font-family:Arial;color:#333333;">Phrase Cloud</h1>', unsafe_allow_html=True)
+    # Generate the Phrase cloud
+    st.markdown("<div style='font-size: 15px; font-family: Arial; color: #707070;'>Phrase Cloud</div>", unsafe_allow_html=True)
     phrase_cloud_valuable = WordCloud(width=800, height=400, background_color='white', stopwords=HRIS_stopwords).generate_from_frequencies(bigram_freq_valuable)
 
     st.image(phrase_cloud_valuable.to_array(), use_column_width=True)
 
-    #define ngrams
-    # Function to extract n-grams from text
-    def extract_ngrams(x, n):
-        ngrams = []
-        phrases = x.split(', ')
-        for phrase in phrases:
-            words = phrase.split(' ')
-            ngrams.extend([' '.join(ng) for ng in nltk_ngrams(words, n)])
-        return ngrams
-    
-    # Concatenate all text data
-    all_valuable_activities = ' '.join(valuable_activities_keywords.astype(str))
-
-    # Generate unigrams, bigrams, and trigrams
-    unigrams_valuable = extract_ngrams(all_valuable_activities, 1)
-    bigrams_valuable = extract_ngrams(all_valuable_activities, 2)
-    trigrams_valuable = extract_ngrams(all_valuable_activities, 3)
-
-    # Count the frequency of each n-gram
-    unigram_freq_valuable = Counter(unigrams_valuable)
-    bigram_freq_valuable = Counter(bigrams_valuable)
-    trigram_freq_valuable = Counter(trigrams_valuable)
-
-    #combine the frequencies
-    ngram_freq_valuable = unigram_freq_valuable + bigram_freq_valuable + trigram_freq_valuable
-
-    #generate the first phrasecloud
-    phrase_cloud_valuable1 = WordCloud(width=800, height=400, background_color='white', stopwords=HRIS_stopwords).generate_from_frequencies(ngram_freq_valuable)
-
-    # Display the word cloud using Streamlit
-    st.markdown('<h1 style="font-size:17px;font-family:Arial;color:#333333;">Phrase Cloud</h1>', unsafe_allow_html=True)
-    st.image(phrase_cloud_valuable1.to_array(), use_column_width=True)
-
-
-    st.write("what are the most valuable activities your current HRIS enable you to do")
+    st.write("what are the most valuable activities your current HRIS enable employees to do")
     # Function to split and list phrases
     def list_phrases(dataframe):
         phrases = []
@@ -1549,8 +1515,8 @@ if dashboard == "Section 8: User Experience":
     phrases_valuable = list_phrases(valuable_activities_keywords)
 
     # Convert to DataFrame and sort by phrase length
-    phrases_valuable_df = pd.DataFrame(phrases_valuable, columns=['Key Reasons']).sort_values(by='Key Reasons', key=lambda x: x.str.len())
-    phrases_valuable_df = phrases_valuable_df[phrases_valuable_df['Key Reasons'].str.strip() != '']
+    phrases_valuable_df = pd.DataFrame(phrases_valuable, columns=['Key Activities']).sort_values(by='Key Activities', key=lambda x: x.str.len())
+    phrases_valuable_df = phrases_valuable_df[phrases_valuable_df['Key Activities'].str.strip() != '']
 
     # Checkbox to decide whether to display the complete DataFrame
     if st.checkbox('Display all key phrases for Most Valuable Activities in the Current HRIS'):
@@ -1564,10 +1530,15 @@ if dashboard == "Section 8: User Experience":
     href_valuable = f'<a href="data:file/csv;base64,{b64_valauable}" download="Most_Valuable_Activities.csv">Download Most_Valuable_Activities CSV File</a>'
     st.markdown(href_valuable, unsafe_allow_html=True)
 
-    #Column 70: In the context of your job, what do your current HRIS fail to address?
-
-    # Display the most functions are missing in the current HRIS
-    st.markdown('<h1 style="font-size:17px;font-family:Arial;color:#333333;">Most Functions Missing in the Current HRIS</h1>', unsafe_allow_html=True)
+    ### Question63: In the context of your job, what do your current HRIS fail to address?
+    st.markdown(
+        """
+        <h2 style='font-size: 17px; font-family: Arial; color: #333333;'>
+        In the context of your job, what do your current HRIS fail to address?
+        </h2>
+        """,
+        unsafe_allow_html=True
+    )
 
     #stopwords for most functions are missing in the current HRIS
     HRIS_stopwords2 = ["I", "my", "activities", "fail", "address", "missing", "HRIS", "valuable", "system", "HR", "current", "functionalities", "system", "payroll", "compensation", "miss", "missing", "this","about", "of", ",", "to", "a", "what", "on", "could", "do", "we", "their", "the", "learning", "management", "system", "employees", "company", "system", "like", "choose", "help", "need", "everyone", "makes", "improved", "improvement", "format", "today", "no", "and","should","more", "training", "data", "according", "you"]
@@ -1578,7 +1549,7 @@ if dashboard == "Section 8: User Experience":
     word_cloud_functions = WordCloud(width=800, height=400, background_color='white', stopwords=HRIS_stopwords2).generate(' '.join(functions_missing.dropna().astype(str)))
 
     # Display the word cloud using Streamlit
-    st.title('Word Cloud for Most Functions Missing in the Current HRIS')
+    st.markdown("<div style='font-size: 15px; font-family: Arial; color: #707070;'>Word Cloud</div>", unsafe_allow_html=True)
     st.image(word_cloud_functions.to_array(), use_column_width=True)
 
     #Generate more complex wordcloud if there are more repsonses
@@ -1602,17 +1573,15 @@ if dashboard == "Section 8: User Experience":
     phrase_cloud_functions = WordCloud(width=800, height=400, background_color='white', stopwords=HRIS_stopwords2).generate_from_frequencies(bigram_freq_functions)
 
     # Display the word cloud using Streamlit
-    st.title('Phrase Cloud for Most Functions Missing in the Current HRIS')
+    st.markdown("<div style='font-size: 15px; font-family: Arial; color: #707070;'>Phrase Cloud</div>", unsafe_allow_html=True)
     st.image(phrase_cloud_functions.to_array(), use_column_width=True)
-
-    st.write("what do your current HRIS fail to address")
 
     # Function to split and list phrases
     phrases_functions = list_phrases(functions_missing_keywords)
 
     # Convert to DataFrame and sort by phrase length
-    phrases_functions_df = pd.DataFrame(phrases_functions, columns=['Key Reasons']).sort_values(by='Key Reasons', key=lambda x: x.str.len())
-    phrases_functions_df = phrases_functions_df[phrases_functions_df['Key Reasons'].str.strip() != '']
+    phrases_functions_df = pd.DataFrame(phrases_functions, columns=['Issues to Be Resovled']).sort_values(by='Issues to Be Resovled', key=lambda x: x.str.len())
+    phrases_functions_df = phrases_functions_df[phrases_functions_df['Issues to Be Resovled'].str.strip() != '']
 
     # Checkbox to decide whether to display the complete DataFrame
     if st.checkbox('Display complete Key Phrases for Most Functions Missing in the Current HRIS'):
@@ -1627,7 +1596,16 @@ if dashboard == "Section 8: User Experience":
     st.markdown(href_functions, unsafe_allow_html=True)
 
     #Column 72: In 3 words, how would you describe your experience with the current HRIS?
-    st.markdown('<h1 style="font-size:17px;font-family:Arial;color:#333333;">Overall Experience with the Current HRIS</h1>', unsafe_allow_html=True)
+    st.markdown(
+        """
+        <h2 style='font-size: 17px; font-family: Arial; color: #333333;'>
+        In 3 words, how would you describe your current user-experience with the HRIS ?
+        </h2>
+        """,
+        unsafe_allow_html=True
+    )
+
+    st.markdown("<div style='font-size: 15px; font-family: Arial; color: #707070;'>Overall Experience with the HRIS Experience</div>", unsafe_allow_html=True)
 
     #get the data
     overall_experience = filtered_data.iloc[:, 72]
@@ -1667,11 +1645,10 @@ if dashboard == "Section 8: User Experience":
     phrase_cloud_overall = WordCloud(width=800, height=400, background_color='white', stopwords = Overall_stopwords).generate_from_frequencies(combined_freq_overall)
 
     # Display the word cloud using Streamlit
-    st.title('Phrase Cloud for Overall Experience with the Current HRIS')
+    st.markdown("<div style='font-size: 15px; font-family: Arial; color: #707070;'>Phrase Cloud</div>", unsafe_allow_html=True)
     st.image(phrase_cloud_overall.to_array(), use_column_width=True)
 
     #sentiment analysis for overall experience with the current HRIS
-    st.write("In 3 words, how would you describe your experience with the current HRIS?")
 
     def get_sentiment_label(text):
         analyzer = sentiment_analyzer()
@@ -1684,9 +1661,6 @@ if dashboard == "Section 8: User Experience":
         else:
             return 'neutral'
 
-    # Apply the function to the 72nd column
-    filtered_data['star_rating'] = filtered_data.iloc[:, 72].apply(lambda text: predict_star_rating(text, tokenizer, model))
-    st.write(filtered_data)
 
     #count the number of positive, negative and neutral sentiments
     sentiment_count = filtered_data['star_rating'].value_counts()
@@ -1773,6 +1747,12 @@ if dashboard == "Section 8: User Experience":
         fig_function2.update_yaxes(showticklabels=True, title='')
         fig_function2.update_xaxes(showticklabels=False, title='')
         st.plotly_chart(fig_function2, use_container_width=True, key="functions_bar_chart2")
+
+    #check if the user wants to see the data
+    if st.checkbox('Display complete Description Data in 3 words'):
+        # Convert DataFrame to HTML and display it
+        html = filtered_data.iloc[:, 72].to_html(index=False)
+        st.markdown(html, unsafe_allow_html=True)
 
 
 
