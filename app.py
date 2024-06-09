@@ -1458,7 +1458,7 @@ if dashboard == "Section 8: User Experience":
     st.markdown('<h1 style="font-size:17px;font-family:Arial;color:#333333;">Most Valuable Activities in the Current HRIS</h1>', unsafe_allow_html=True)
 
     #stopwords for most valuable activities in the current HRIS
-    HRIS_stopwords = ["I", "my", "activities", "HRIS", "valuable", "system", "HR", "current", "functionalities", "system", "payroll", "compensation", "miss", "missing", "this","about", "of", ",", "to", "a", "what", "on", "could", "do", "we", "their", "the", "learning", "management", "system", "employees", "company", "system", "like", "choose", "help", "need", "everyone", "makes", "improved", "improvement", "format", "today", "no", "and","should","more", "training", "data", "according", "you"]
+    HRIS_stopwords = ["I","and" ," and", "and ", " ;", "; ", " to", " for", "for ", "for", "to ", "my", "activities", "HRIS", "valuable", "system", "HR", "current", "functionalities", "system", "payroll", "compensation", "miss", "missing", "this","about", "of", ",", "to", "a", "what", "on", "could", "do", "we", "their", "the", "learning", "management", "system", "employees", "company", "system", "like", "choose", "help", "need", "everyone", "makes", "improved", "improvement", "format", "today", "no", "and","should","more", "training", "data", "according", "you"]
     
     valuable_activities = filtered_data.iloc[:, 69]
 
