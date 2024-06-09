@@ -198,8 +198,10 @@ def prepare_summaries(data):
 
     role_summary = pd.DataFrame(data['What is your role at the company ?'].value_counts()).reset_index()
     role_summary.columns = ['Role', 'Count']
+    role_summary = role_summary.sort_values('Count', ascending=True)
     function_summary = pd.DataFrame(data['What function are you part of ?'].value_counts()).reset_index()
     function_summary.columns = ['Function', 'Count']
+    function_summary = function_summary.sort_values('Count', ascending=True)
     return location_summary, role_summary, function_summary
 
 # MARIAS SCORE DISTRIBUTION FUNCTION
@@ -228,6 +230,11 @@ satisfaction_options = ['Select a satisfaction level', 'Very Dissatisfied', 'Dis
 def filter_by_satisfaction(data, satisfaction_level, column_index):
     if satisfaction_level != 'Select a satisfaction level':
         data = data[data.iloc[:, column_index] == satisfaction_options.index(satisfaction_level)]
+    return data
+
+def filter_by_comfort(data, comfort_level, column_index):
+    if comfort_level != 'Select a comfort level':
+        data = data[data.iloc[:, column_index] == comfort_options.index(comfort_level)]
     return data
 
 ############ SENTIMENT ANALYSIS FUNCTION STARTS ############
@@ -598,6 +605,76 @@ if dashboard == 'Section 3: Performance & Talent':
         st.table(top_5_negative[columns_to_display2])
     
     #################stay only in this dashboard end##################
+
+    ### Question21: From 1 to 5, how comfortable do you feel discussing your career goals and development with your manager? 
+    with satisfaction_col:
+        st.markdown('<div class="chart-container">', unsafe_allow_html=True)
+        categories = ['Very Uncomfortable', 'Uncomfortable', 'Hesitant', 'Comfortable', 'Very Comfortable']
+        q21ValuesCount, q21MedianScore = score_distribution(filtered_data, 28)
+
+        ratings_df = pd.DataFrame({'Comfort Level': categories, 'Percentage': q21ValuesCount.values})
+
+        # Display title and median score
+        title_html = f"<h2 style='font-size: 17px; font-family: Arial; color: #333333;'>Comfort Level in Discussing Career Goals         and Development with Manager</h2>"
+        caption_html = f"<div style='font-size: 15px; font-family: Arial; color: #707070;'>The median comfort score is                   {q21MedianScore:.1f}</div>"
+        st.markdown(title_html, unsafe_allow_html=True)
+        st.markdown(caption_html, unsafe_allow_html=True)
+
+        # Create a horizontal bar chart with Plotly
+        fig = px.bar(ratings_df, y='Comfort Level', x='Percentage', text='Percentage',
+                     orientation='h',
+                     color='Comfort Level', color_discrete_map={
+                'Very Uncomfortable': '#440154',  # Dark purple
+                'Uncomfortable': '#3b528b',  # Dark blue
+                'Hesitant': '#21918c',  # Cyan
+                'Comfortable': '#5ec962',  # Light green
+                'Very Comfortable': '#fde725'  # Bright yellow
+            })
+
+        # Remove legend and axes titles
+        fig.update_layout(showlegend=False, xaxis_visible=False, xaxis_title=None, yaxis_title=None, autosize=True,
+                          height=300, margin=dict(l=20, r=20, t=30, b=20))
+
+        # Format text on bars
+        fig.update_traces(texttemplate='%{x:.1f}%', textposition='outside')
+        fig.update_xaxes(range=[0, max(ratings_df['Percentage']) * 1.1])
+
+        # Improve layout aesthetics
+        fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide')
+
+        # Use Streamlit to display the Plotly chart
+        st.plotly_chart(fig, use_container_width=True, key="overall_rating_bar_chart")
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    with barcharts_col:
+        comfort_options = ['Select a comfort level', 'Very Uncomfortable', 'Uncomfortable', 'Hesitant',
+                           'Comfortable', 'Very Comfortable']
+        comfort_dropdown1 = st.selectbox('', comfort_options,
+                                         key='comfort_dropdown1')
+
+        comfort_filtered_data1 = filter_by_comfort(filtered_data, comfort_dropdown1, 28)
+
+        location_summary1, role_summary1, function_summary1 = prepare_summaries(comfort_filtered_data1)
+        left_margin = 150
+        total_height = 310
+        role_chart_height = total_height * 0.45
+        function_chart_height = total_height * 0.55
+
+        fig_role1 = px.bar(role_summary1, y='Role', x='Count', orientation='h')
+        fig_role1.update_layout(title="by Role", margin=dict(l=left_margin, r=0, t=50, b=0),
+                                height=role_chart_height, showlegend=False)
+        fig_role1.update_traces(marker_color='#336699', text=role_summary1['Count'], textposition='outside')
+        fig_role1.update_yaxes(showticklabels=True, title='')
+        fig_role1.update_xaxes(showticklabels=False, title='')
+        st.plotly_chart(fig_role1, use_container_width=True, key="roles_bar_chart1")
+
+        fig_function1 = px.bar(function_summary1, y='Function', x='Count', orientation='h')
+        fig_function1.update_layout(title="by Function", margin=dict(l=left_margin, r=0, t=50, b=0),
+                                    height=function_chart_height, showlegend=False)
+        fig_function1.update_traces(marker_color='#336699', text=function_summary1['Count'], textposition='outside')
+        fig_function1.update_yaxes(showticklabels=True, title='')
+        fig_function1.update_xaxes(showticklabels=False, title='')
+        st.plotly_chart(fig_function1, use_container_width=True, key="functions_bar_chart1")
     
     st.markdown(
     """
