@@ -116,7 +116,6 @@ def render_header(title, subtitle=None):
 # Sidebar for dashboard selection
 dashboard = st.sidebar.radio("Select Sentiment/Reason Analysis Dashboard", (
                                                   'Section 1: Employee Experience',
-                                                  'Section 2: Recruiting & Onboarding',
                                                   'Section 3: Performance & Talent',
                                                   'Section 4: Learning',
                                                   'Section 5: Compensation',
