@@ -114,7 +114,7 @@ def render_header(title, subtitle=None):
 
 
 # Sidebar for dashboard selection
-dashboard = st.sidebar.radio("Select Dashboard", ('General Survey Results',
+dashboard = st.sidebar.radio("Select Sentiment/Reason Analysis Dashboard", ('General Survey Results',
                                                   'Section 1: Employee Experience',
                                                   'Section 2: Recruiting & Onboarding',
                                                   'Section 3: Performance & Talent',
@@ -162,8 +162,6 @@ if dashboard == 'General Survey Results':
     render_header("General Survey Results")
 elif dashboard == 'Section 1: Employee Experience':
     render_header("Employee Experience: General HR Services Evaluation")
-elif dashboard == 'Section 2: Recruiting & Onboarding':
-    render_header("Recruiting & Onboarding")
 elif dashboard == 'Section 3: Performance & Talent':
     render_header("Performance & Talent")
 elif dashboard == 'Section 4: Learning':
@@ -393,7 +391,6 @@ if dashboard == 'Section 1: Employee Experience':
         st.plotly_chart(fig_function2, use_container_width=True, key="functions_bar_chart2")
     
     # Question 9: Which reason(s) drive that score ?
-    st.title("Sentiment Analysis App")
 
     # Display the reasons for communication channel satisfaction
     st.markdown('<h1 style="font-size:17px;font-family:Arial;color:#333333;">The Reasons for Ratings on Communication Channels</h1>', unsafe_allow_html=True)
@@ -537,7 +534,6 @@ if dashboard == 'Section 3: Performance & Talent':
     
     
     ### Question20: Which reason(s) drive that score ?
-    st.title("Sentiment Analysis App")
 
     # Display the reasons for performance evaluation and feedback process satisfaction
     st.markdown('<h1 style="font-size:17px;font-family:Arial;color:#333333;">The Reasons for Ratings on Performance Evaluation and Feedback Process</h1>', unsafe_allow_html=True)
@@ -711,7 +707,6 @@ if dashboard == 'Section 4: Learning':
         st.plotly_chart(fig_function1, use_container_width=True, key="functions_bar_chart1")
 
     ### Column 35: What could be improved or what kind of format is missing today ?
-    st.title("Sentiment Analysis App")
 
     # Display the improvement/missing format for learning management system
     st.markdown('<h1 style="font-size:17px;font-family:Arial;color:#333333;">the improvement/missing format for learning management system</h1>', unsafe_allow_html=True)
@@ -768,12 +763,12 @@ if dashboard == 'Section 4: Learning':
     phrases = list_phrases(improvement_and_missing_keywords)
 
     # Convert to DataFrame and sort by phrase length
-    phrases_df = pd.DataFrame(phrases, columns=['Key Reasons']).sort_values(by='Key Reasons', key=lambda x: x.str.len())
+    phrases_df = pd.DataFrame(phrases, columns=['Improvement/Missing']).sort_values(by='Improvement/Missing', key=lambda x: x.str.len())
     
-    phrases_df = phrases_df[phrases_df['Key Reasons'].str.strip() != '']
+    phrases_df = phrases_df[phrases_df['Improvement/Missing'].str.strip() != '']
 
     # Checkbox to decide whether to display the complete DataFrame
-    if st.checkbox('Display complete Key Reasons'):
+    if st.checkbox('Display complete Improvement/Missing DataFrame Mentioned'):
         # Convert DataFrame to HTML and display it
         html = phrases_df.to_html(index=False)
         st.markdown(html, unsafe_allow_html=True)
@@ -781,7 +776,7 @@ if dashboard == 'Section 4: Learning':
     # Convert DataFrame to CSV and generate download link
     csv = phrases_df.to_csv(index=False)
     b64 = base64.b64encode(csv.encode()).decode()  # some strings <-> bytes conversions necessary here
-    href = f'<a href="data:file/csv;base64,{b64}" download="Key_Reasons.csv">Download Key Reasons CSV File</a>'
+    href = f'<a href="data:file/csv;base64,{b64}" download="improvement_missing.csv">Download improvement_missing csv file</a>'
     st.markdown(href, unsafe_allow_html=True)
 
 if dashboard == 'Section 5: Compensation':
