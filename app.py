@@ -1656,7 +1656,7 @@ if dashboard == "Section 8: User Experience":
     st.write(filtered_data)
 
     #count the number of positive, negative and neutral sentiments
-    sentiment_count = filtered_data['star rating'].value_counts()
+    sentiment_count = filtered_data['star_rating'].value_counts()
 
     # Display the sentiment count   
     # A text container for filtering instructions
