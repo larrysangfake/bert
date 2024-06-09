@@ -1559,17 +1559,21 @@ if dashboard == "Section 8: User Experience":
     #get the data
     overall_experience = filtered_data.iloc[:, 72]
 
-    # Function to extract bigrams from text
-    def extract_bigrams3(x):
-        bigrams = []
+    #set the stopwords
+    Overall_stopwords = [",", ";", "not very", "I", "my", "activities", "fail", "address", "missing", "HRIS", "valuable", "system", "HR", "current", "functionalities", "system", "payroll", "compensation", "miss", "missing", "this","about", "of", ",", "to", "a", "what", "on", "could", "do", "we", "their", "the", "learning", "management", "system", "employees", "company", "system", "like", "choose", "help", "need", "everyone", "makes", "improved", "improvement", "format", "today", "no", "and","should","more", "training", "data", "according", "you"]
+
+    # Function to extract n-grams from text
+    def extract_ngrams(x, n):
+        ngrams = []
         # Split the phrases by comma and space
         phrases = x.split(', ')
         for phrase in phrases:
             # Split the phrase into words
             words = phrase.split(' ')
-            # Generate bigrams for the words
-            bigrams.extend(list(ngrams(words, 2)))
-        return bigrams
+            # Generate n-grams for the words
+            ngrams.extend([' '.join(ng) for ng in ngrams(words, n)])
+        return ngrams
+
     
     #drop missing values first
     overall_experience = overall_experience.dropna()
@@ -1577,17 +1581,22 @@ if dashboard == "Section 8: User Experience":
     # Concatenate all text data
     overall_text = ' '.join(overall_experience.astype(str))
 
-    # Generate bigrams
-    bigrams_overall = extract_bigrams3(overall_text)
+    # Generate unigrams, bigrams, and trigrams
+    unigrams_overall = extract_ngrams(overall_text, 1)
+    bigrams_overall = extract_ngrams(overall_text, 2)
+    trigrams_overall = extract_ngrams(overall_text, 3)
 
-    # Count the frequency of each bigram
+    # Count the frequency of each n-gram
+    unigram_freq_overall = Counter(unigrams_overall)
     bigram_freq_overall = Counter(bigrams_overall)
+    trigram_freq_overall = Counter(trigrams_overall)
 
-    # Convert bigrams from tuples to strings
-    bigram_freq_overall_str = { ' '.join(k): v for k, v in bigram_freq_overall.items() }
+    # Combine the frequencies
+    combined_freq_overall = unigram_freq_overall + bigram_freq_overall + trigram_freq_overall
 
     # Generate the word cloud
-    phrase_cloud_overall = WordCloud(width=800, height=400, background_color='white', stopwords = HRIS_stopwords2).generate_from_frequencies(bigram_freq_overall_str)
+    phrase_cloud_overall = WordCloud(width=800, height=400, background_color='white', stopwords = Overall_stopwords).generate_from_frequencies(combined_freq_overall)
+
     # Display the word cloud using Streamlit
     st.title('Phrase Cloud for Overall Experience with the Current HRIS')
     st.image(phrase_cloud_overall.to_array(), use_column_width=True)
