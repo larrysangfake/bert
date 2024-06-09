@@ -716,7 +716,7 @@ if dashboard == 'Section 4: Learning':
     # Function to extract bigrams from text
     def extract_bigrams(text):
         tokens = nltk.word_tokenize(text)
-        bigrams = list(ngrams(tokens, 2))
+        bigrams = list(nltk_ngrams(tokens, 2))
         return [' '.join(bigram) for bigram in bigrams]
 
     # Concatenate all text data
@@ -917,7 +917,7 @@ if dashboard == 'Section 5: Compensation':
     # Function to extract bigrams from text
     def extract_bigrams(text):
         tokens = nltk.word_tokenize(text)
-        bigrams = list(ngrams(tokens, 2))
+        bigrams = list(nltk_ngrams(tokens, 2))
         return [' '.join(bigram) for bigram in bigrams]
 
     # Concatenate all text data
@@ -1335,7 +1335,7 @@ if dashboard == "Section 7: Time Management":
     # Function to extract bigrams from text
     def extract_bigrams(text):
         tokens = nltk.word_tokenize(text)
-        bigrams = list(ngrams(tokens, 2))
+        bigrams = list(nltk_ngrams(tokens, 2))
         return [' '.join(bigram) for bigram in bigrams]
 
     # Concatenate all text data
@@ -1444,7 +1444,7 @@ if dashboard == "Section 8: User Experience":
     # Function to extract bigrams from text
     def extract_bigrams(text):
         tokens = nltk.word_tokenize(text)
-        bigrams = list(ngrams(tokens, 2))
+        bigrams = list(nltk_ngrams(tokens, 2))
         return [' '.join(bigram) for bigram in bigrams]
 
     # Concatenate all text data
@@ -1571,7 +1571,6 @@ if dashboard == "Section 8: User Experience":
             ngrams.extend([' '.join(ng) for ng in nltk_ngrams(words, n)])
         return ngrams
 
-    
     #drop missing values first
     overall_experience = overall_experience.dropna()
 
