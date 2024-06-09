@@ -1601,7 +1601,7 @@ if dashboard == "Section 8: User Experience":
     st.write("In 3 words, how would you describe your experience with the current HRIS?")
 
     def get_sentiment_label(text):
-        analyzer = SentimentIntensityAnalyzer()
+        analyzer = sentiment_analyzer()
         sentiment = analyzer.polarity_scores(text)
         compound = sentiment['compound']
         if compound >= 0.05:
