@@ -628,9 +628,6 @@ if dashboard == 'Section 3: Performance & Talent':
     # Set the y-axis title
     fig1.update_yaxes(title_text='Reasons for Discomfort')
 
-    # Rotate the y-axis labels to be horizontal
-    fig1.update_layout(yaxis_tickangle=-90)
-
     # Show the chart
     st.plotly_chart(fig1, use_container_width=False)
 
