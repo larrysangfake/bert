@@ -429,19 +429,19 @@ if dashboard == 'Section 1: Employee Experience':
 
 
     # Display tables in Streamlit
-    show_positive_key_phrases = st.checkbox("Show Top 5 Positive Key Phrases")
+    show_positive_key_phrases = st.checkbox("Show top 5 positive key phrases")
     if show_positive_key_phrases:
         st.table(top_5_positive[columns_to_display1])
 
-    show_negative_key_phrases = st.checkbox("Show Top 5 Negative Key Phrases")
+    show_negative_key_phrases = st.checkbox("Show top 5 negative key phrases")
     if show_negative_key_phrases:
         st.table(top_5_negative[columns_to_display1])
     
-    show_positive_responses = st.checkbox("Show Top 5 Positive Responses")
+    show_positive_responses = st.checkbox("Show Top 5 positive responses")
     if show_positive_responses:
         st.table(top_5_positive[columns_to_display2])
     
-    show_negative_responses = st.checkbox("Show Top 5 Negative Responses")
+    show_negative_responses = st.checkbox("Show Top 5 negative responses")
     if show_negative_responses:
         st.table(top_5_negative[columns_to_display2])
     #################stay only in this dashboard end##################
@@ -581,19 +581,19 @@ if dashboard == 'Section 3: Performance & Talent':
     columns_to_display2 = ['From 1 to 5, how satisfied are you with the company\'s performance evaluation and feedback process ?', 'Which reason(s) drive that score ?2']
 
     # Display tables in Streamlit
-    show_positive_key_phrases = st.checkbox("Show Top 5 Positive Key Phrases")
+    show_positive_key_phrases = st.checkbox("Show top 5 positive key phrases")
     if show_positive_key_phrases:
         st.table(top_5_positive[columns_to_display1])
     
-    show_negative_key_phrases = st.checkbox("Show Top 5 Negative Key Phrases")
+    show_negative_key_phrases = st.checkbox("Show top 5 negative key phrases")
     if show_negative_key_phrases:
         st.table(top_5_negative[columns_to_display1])
     
-    show_positive_responses = st.checkbox("Show Top 5 Positive Responses")
+    show_positive_responses = st.checkbox("Show top 5 positive responses")
     if show_positive_responses:
         st.table(top_5_positive[columns_to_display2])
 
-    show_negative_responses = st.checkbox("Show Top 5 Negative Responses")
+    show_negative_responses = st.checkbox("Show Top 5 negative responses")
     if show_negative_responses:
         st.table(top_5_negative[columns_to_display2])
     
@@ -736,7 +736,7 @@ if dashboard == 'Section 4: Learning':
     ### Column 35: What could be improved or what kind of format is missing today ?
 
     # Display the improvement/missing format for learning management system
-    st.markdown('<h1 style="font-size:17px;font-family:Arial;color:#333333;">the improvement/missing format for learning management system</h1>', unsafe_allow_html=True)
+    st.markdown('<h1 style="font-size:17px;font-family:Arial;color:#333333;">The Improvement/Missing Format for Learning Management System</h1>', unsafe_allow_html=True)
 
     #Extract key phrases from the text
     learning_stopwords = ["this","about", "of", "to", "a", "what", "on", "could", "do", "we", "their", "the", "learning", "management", "system", "employees", "company", "help", "need", "everyone", "makes", "improved", "improvement", "missing", "format", "today", "no", "and","should","more", "training"]
@@ -806,7 +806,7 @@ if dashboard == 'Section 4: Learning':
     phrases_df = phrases_df[phrases_df['Improvement/Missing'].str.strip() != '']
 
     # Checkbox to decide whether to display the complete DataFrame
-    if st.checkbox('Display complete Improvement/Missing DataFrame Mentioned'):
+    if st.checkbox('Display complete improvement/missing dataFrame mentioned'):
         # Convert DataFrame to HTML and display it
         html = phrases_df.to_html(index=False)
         st.markdown(html, unsafe_allow_html=True)
@@ -1157,19 +1157,10 @@ if dashboard == 'Section 6: Payroll':
         fig_function1.update_xaxes(showticklabels=False, title='')
         st.plotly_chart(fig_function1, use_container_width=True, key="functions_bar_chart1")
 
-        ### Question46: Can you share any specific features of your current system that you like/that made you choose it?
-        st.markdown(
-            """
-            <h2 style='font-size: 17px; font-family: Arial; color: #333333;'>
-            Any specific features of the current system that people like/that made people choose it?
-            </h2>
-            """,
-            unsafe_allow_html=True
-        )
-
+    ### Question53: What specific features of the current system do you like/that made you choose it ?
 
     # Display the specific features of the current system that you like/that made you choose it
-    st.markdown('<h1 style="font-size:17px;font-family:Arial;color:#333333;">specific features of your current system that you like/that made you choose it</h1>', unsafe_allow_html=True)
+    st.markdown('<h2 style="font-size:17px;font-family:Arial;color:#333333;">Specific Features of the Current System that People like/that made People choose it</h2>', unsafe_allow_html=True)
 
     #stopwords for specific features of the current system that you like/that made you choose it
     features_stopwords = ["payroll", "compensation", "miss", "missing", "this","about", "of", ",", "to", "a", "what", "on", "could", "do", "we", "their", "the", "learning", "management", "system", "employees", "company", "system", "like", "choose", "help", "need", "everyone", "makes", "improved", "improvement", "format", "today", "no", "and","should","more", "training", "data", "according", "you"]
@@ -1239,7 +1230,11 @@ if dashboard == 'Section 6: Payroll':
     phrases_df = phrases_df[phrases_df['Key Features'].str.strip() != '']
 
     #################stay only in this dashboard end##################
-
+    
+    st.markdown(
+        "<h3 style='text-align: center; font-size: 20px; font-weight: normal;'>All specific features of the current system that people like/that made people choose it</h3>",
+        unsafe_allow_html=True)
+    st.write(specific_features)
 
     # Checkbox to decide whether to display the complete DataFrame
     if st.checkbox('Display complete specific features of the current system that people like/that made people choose it'):
@@ -1440,12 +1435,9 @@ if dashboard == "Section 7: Time Management":
 
     # Display the word cloud using Streamlit
     st.markdown(
-            "<h3 style='text-align: center; font-size: 20px; font-weight: normal;'>Phrase Cloud</h3>",
-            unsafe_allow_html=True)
+        "<h3 style='text-align: center; font-size: 20px; font-weight: normal;'>Phrase Cloud</h3>",
+        unsafe_allow_html=True)
     st.image(phrase_cloud.to_array(), use_column_width=True)
-
-    st.markdown("<div style='font-size: 15px; font-family: Arial; color: #707070;'>All the functionalities missing from the current system:</div>", unsafe_allow_html=True)
-    st.write(functionalities_missing)
 
     # Function to split and list phrases
     def list_phrases(dataframe):
@@ -1463,6 +1455,11 @@ if dashboard == "Section 7: Time Management":
     phrases_df = phrases_df[phrases_df['functionalities missing'].str.strip() != '']
 
     #################stay only in this dashboard end##################
+
+    st.markdown(
+        "<h3 style='text-align: center; font-size: 20px; font-weight: normal;'>All the functionalities missing from the current system:</h3>",
+        unsafe_allow_html=True)
+    st.write(functionalities_missing)
 
     # Checkbox to decide whether to display the complete DataFrame
     if st.checkbox('Display complete missing functionalities'):
@@ -1500,7 +1497,7 @@ if dashboard == "Section 8: User Experience":
     st.markdown(
     """
     <h2 style='font-size: 17px; font-family: Arial; color: #333333;'>
-    In the context of employees' job, what are the most valuable activities the current HRIS enable them to do?
+    In the context of the job, what are the most valuable activities the current HRIS enable them to do?
     </h2>
     """,
     unsafe_allow_html=True
@@ -1652,7 +1649,7 @@ if dashboard == "Section 8: User Experience":
     phrases_functions_df = phrases_functions_df[phrases_functions_df['Issues to Be Resovled'].str.strip() != '']
 
     # Checkbox to decide whether to display the complete DataFrame
-    if st.checkbox('Display complete Key Phrases for Most Functions Missing in the Current HRIS'):
+    if st.checkbox('Display all key phrases for issues in the current HRIS'):
         # Convert DataFrame to HTML and display it
         html = phrases_functions_df.to_html(index=False)
         st.markdown(html, unsafe_allow_html=True)
@@ -1668,7 +1665,7 @@ if dashboard == "Section 8: User Experience":
     st.markdown(
         """
         <h2 style='font-size: 17px; font-family: Arial; color: #333333;'>
-        In 3 words, how would you describe your current user-experience with the HRIS ?
+        In 3 words, how would people describe the current user-experience with the HRIS ?
         </h2>
         """,
         unsafe_allow_html=True
