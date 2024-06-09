@@ -299,27 +299,6 @@ sentiment_analyzer = load_sentiment_analyzer()
 tokenizer, model = load_star_rating_model()
 kw_model = load_keyword_extractor()
 
-# Streamlit app layout
-st.title("Text Analysis with Transformers")
-
-user_input = st.text_area("Enter your text here:")
-
-if st.button("Analyze"):
-    if user_input:
-        # Sentiment analysis
-        sentiment_score = get_transformer_sentiment(user_input)
-        st.write(f"Sentiment Score: {sentiment_score}")
-
-        # Star rating prediction
-        star_rating = predict_star_rating(user_input, tokenizer, model)
-        st.write(f"Star Rating: {star_rating} ⭐")
-
-        # Keyword extraction
-        keywords = extract_keywords(user_input)
-        st.write(f"Extracted Keywords: {keywords}")
-    else:
-        st.write("Please enter some text to analyze.")
-
 
 ############ SENTIMENT ANALYSIS FUNCTION ENDS ############
 
@@ -1452,10 +1431,10 @@ if dashboard == "Section 8: User Experience":
     )
 
 
-    
-
     # Display the most valuable activities in the current HRIS
-    st.markdown("<div style='font-size: 15px; font-family: Arial; color: #707070;'>Most Valuable Activities in the Current HRIS</div>", unsafe_allow_html=True)
+    st.markdown(
+            "<h1 style='text-align: center; font-size: 24px; font-weight: normal;'>Most Valuable Activities in the Current HRIS</h1>",
+            unsafe_allow_html=True)
 
     #stopwords for most valuable activities in the current HRIS
     HRIS_stopwords = ["I","and" ," and", "and ", " ;", "; ", " to", " for", "for ", "for", "to ", "my", "activities", "HRIS", "valuable", "system", "HR", "current", "functionalities", "system", "payroll", "compensation", "miss", "missing", "this","about", "of", ",", "to", "a", "what", "on", "could", "do", "we", "their", "the", "learning", "management", "system", "employees", "company", "system", "like", "choose", "help", "need", "everyone", "makes", "improved", "improvement", "format", "today", "no", "and","should","more", "training", "data", "according", "you"]
@@ -1469,7 +1448,14 @@ if dashboard == "Section 8: User Experience":
     word_cloud_valuable = WordCloud(width=800, height=400, background_color='white', stopwords=HRIS_stopwords).generate(' '.join(valuable_activities.dropna().astype(str)))
 
     # Display the most valuable activities in the current HRIS
-    st.markdown("<div style='font-size: 15px; font-family: Arial; color: #707070;'>Word Cloud</div>", unsafe_allow_html=True)
+    st.markdown(
+        "<h1 style='text-align: center; font-size: 24px; font-weight: normal;'>Most Valuable Activities in the Current HRIS</h1>",
+        unsafe_allow_html=True)
+    
+    st.markdown(
+            "<h3 style='text-align: center; font-size: 20px; font-weight: normal;'>Word Cloud</h3>",
+            unsafe_allow_html=True)
+    
     st.image(word_cloud_valuable.to_array(), use_column_width=True)
     
 
@@ -1497,12 +1483,15 @@ if dashboard == "Section 8: User Experience":
     bigram_freq_valuable = Counter(bigrams_valuable)
 
     # Generate the Phrase cloud
-    st.markdown("<div style='font-size: 15px; font-family: Arial; color: #707070;'>Phrase Cloud</div>", unsafe_allow_html=True)
+    st.markdown(
+            "<h3 style='text-align: center; font-size: 20px; font-weight: normal;'>Phrase Cloud</h3>",
+            unsafe_allow_html=True)
+    
     phrase_cloud_valuable = WordCloud(width=800, height=400, background_color='white', stopwords=HRIS_stopwords).generate_from_frequencies(bigram_freq_valuable)
 
     st.image(phrase_cloud_valuable.to_array(), use_column_width=True)
 
-    st.write("what are the most valuable activities your current HRIS enable employees to do")
+    
     # Function to split and list phrases
     def list_phrases(dataframe):
         phrases = []
@@ -1549,7 +1538,9 @@ if dashboard == "Section 8: User Experience":
     word_cloud_functions = WordCloud(width=800, height=400, background_color='white', stopwords=HRIS_stopwords2).generate(' '.join(functions_missing.dropna().astype(str)))
 
     # Display the word cloud using Streamlit
-    st.markdown("<div style='font-size: 15px; font-family: Arial; color: #707070;'>Word Cloud</div>", unsafe_allow_html=True)
+    st.markdown(
+            "<h3 style='text-align: center; font-size: 20px; font-weight: normal;'>Word Cloud</h3>",
+            unsafe_allow_html=True)
     st.image(word_cloud_functions.to_array(), use_column_width=True)
 
     #Generate more complex wordcloud if there are more repsonses
@@ -1573,7 +1564,9 @@ if dashboard == "Section 8: User Experience":
     phrase_cloud_functions = WordCloud(width=800, height=400, background_color='white', stopwords=HRIS_stopwords2).generate_from_frequencies(bigram_freq_functions)
 
     # Display the word cloud using Streamlit
-    st.markdown("<div style='font-size: 15px; font-family: Arial; color: #707070;'>Phrase Cloud</div>", unsafe_allow_html=True)
+    st.markdown(
+            "<h3 style='text-align: center; font-size: 20px; font-weight: normal;'>Phrase Cloud</h3>",
+            unsafe_allow_html=True)
     st.image(phrase_cloud_functions.to_array(), use_column_width=True)
 
     # Function to split and list phrases
@@ -1611,7 +1604,7 @@ if dashboard == "Section 8: User Experience":
     overall_experience = filtered_data.iloc[:, 72]
 
     #set the stopwords
-    Overall_stopwords = [",", ";", "not very", "not", "very", " ; ", "I", "my", "activities", "fail", "address", "missing", "HRIS", "valuable", "system", "HR", "current", "functionalities", "system", "payroll", "compensation", "miss", "missing", "this","about", "of", ",", "to", "a", "what", "on", "could", "do", "we", "their", "the", "learning", "management", "system", "employees", "company", "system", "like", "choose", "help", "need", "everyone", "makes", "improved", "improvement", "format", "today", "no", "and","should","more", "training", "data", "according", "you"]
+    Overall_stopwords = [",", ";", " ;", "; ", "not very", "not", "very", " ; ", "I", "my", "activities", "fail", "address", "missing", "HRIS", "valuable", "system", "HR", "current", "functionalities", "system", "payroll", "compensation", "miss", "missing", "this","about", "of", ",", "to", "a", "what", "on", "could", "do", "we", "their", "the", "learning", "management", "system", "employees", "company", "system", "like", "choose", "help", "need", "everyone", "makes", "improved", "improvement", "format", "today", "no", "and","should","more", "training", "data", "according", "you"]
 
     # Function to extract n-grams from text
     def extract_ngrams(x, n):
@@ -1645,21 +1638,14 @@ if dashboard == "Section 8: User Experience":
     phrase_cloud_overall = WordCloud(width=800, height=400, background_color='white', stopwords = Overall_stopwords).generate_from_frequencies(combined_freq_overall)
 
     # Display the word cloud using Streamlit
-    st.markdown("<div style='font-size: 15px; font-family: Arial; color: #707070;'>Phrase Cloud</div>", unsafe_allow_html=True)
+    st.markdown(
+            "<h3 style='text-align: center; font-size: 20px; font-weight: normal;'>Word Cloud</h3>",
+            unsafe_allow_html=True)
     st.image(phrase_cloud_overall.to_array(), use_column_width=True)
 
     #sentiment analysis for overall experience with the current HRIS
 
-    def get_sentiment_label(text):
-        analyzer = sentiment_analyzer()
-        sentiment = analyzer.polarity_scores(text)
-        compound = sentiment['compound']
-        if compound >= 0.05:
-            return 'positive'
-        elif compound <= -0.05:
-            return 'negative'
-        else:
-            return 'neutral'
+
 
 
     #count the number of positive, negative and neutral sentiments
@@ -1753,6 +1739,14 @@ if dashboard == "Section 8: User Experience":
         # Convert DataFrame to HTML and display it
         html = filtered_data.iloc[:, 72].to_html(index=False)
         st.markdown(html, unsafe_allow_html=True)
+
+    # Convert DataFrame to CSV and generate download link
+    csv = filtered_data.iloc[:, 72].to_csv(index=False)
+    b64 = base64.b64encode(csv.encode()).decode()  # some strings <-> bytes conversions necessary here
+    href = f'<a href="data:file/csv;base64,{b64}" download="User_Experience.csv">Download User_Experience CSV File</a>'
+    st.markdown(href, unsafe_allow_html=True)
+
+    
 
 
 
