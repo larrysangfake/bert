@@ -1036,7 +1036,11 @@ if dashboard == 'Section 5: Compensation':
     b64 = base64.b64encode(csv.encode()).decode()  # some strings <-> bytes conversions necessary here
     href = f'<a href="data:file/csv;base64,{b64}" download="data_missing.csv">Download data_missing csv file</a>'
     st.markdown(href, unsafe_allow_html=True)
+    #################stay only in this dashboard end##################
 
+############ SECTION 5 ENDS ############
+
+############ SECTION 6 STARTS ############
 if dashboard == 'Section 6: Payroll':
     filtered_data = apply_filters(data, st.session_state['selected_role'], st.session_state['selected_function'],
                                   st.session_state['selected_location'])
@@ -1185,7 +1189,7 @@ if dashboard == 'Section 6: Payroll':
     #Generate more complex wordcloud if there are more repsonses
     specific_features = specific_features.dropna()
 
-    
+    #################stay only in this dashboard start##################
     def extract_keyphrases(text):
         keywords = kw_model.extract_keywords(text, keyphrase_ngram_range=(2, 4), stop_words='english', use_maxsum=True, nr_candidates=20, top_n=2)
         return ', '.join([word for word, _ in keywords])
@@ -1197,7 +1201,7 @@ if dashboard == 'Section 6: Payroll':
     # Function to extract bigrams from text
     def extract_bigrams(text):
         tokens = nltk.word_tokenize(text)
-        bigrams = list(ngrams(tokens, 2))
+        bigrams = list(nltk_ngrams(tokens, 2))
         return [' '.join(bigram) for bigram in bigrams]
 
     # Concatenate all text data
@@ -1234,6 +1238,9 @@ if dashboard == 'Section 6: Payroll':
     phrases_df = pd.DataFrame(phrases, columns=['Key Features']).sort_values(by='Key Features', key=lambda x: x.str.len())
     phrases_df = phrases_df[phrases_df['Key Features'].str.strip() != '']
 
+    #################stay only in this dashboard end##################
+
+
     # Checkbox to decide whether to display the complete DataFrame
     if st.checkbox('Display complete specific features of the current system that people like/that made people choose it'):
         # Convert DataFrame to HTML and display it
@@ -1246,6 +1253,9 @@ if dashboard == 'Section 6: Payroll':
     href = f'<a href="data:file/csv;base64,{b64}" download="specific_features.csv">Download specific_features CSV File</a>'
     st.markdown(href, unsafe_allow_html=True)
 
+############ SECTION 6 ENDS ############
+
+############ SECTION 7 STARTS ############
 if dashboard == "Section 7: Time Management":
     filtered_data = apply_filters(data, st.session_state['selected_role'], st.session_state['selected_function'],
                                   st.session_state['selected_location'])
@@ -1401,7 +1411,7 @@ if dashboard == "Section 7: Time Management":
     #drop missing values first
     functionalities_missing = functionalities_missing.dropna()
 
-    
+    #################stay only in this dashboard start##################
     def extract_keyphrases(text):
         keywords = kw_model.extract_keywords(text, keyphrase_ngram_range=(2, 4), stop_words='english', use_maxsum=True, nr_candidates=20, top_n=1)
         return ', '.join([word for word, _ in keywords])
@@ -1452,6 +1462,8 @@ if dashboard == "Section 7: Time Management":
     phrases_df = pd.DataFrame(phrases, columns=['functionalities missing']).sort_values(by='functionalities missing', key=lambda x: x.str.len())
     phrases_df = phrases_df[phrases_df['functionalities missing'].str.strip() != '']
 
+    #################stay only in this dashboard end##################
+
     # Checkbox to decide whether to display the complete DataFrame
     if st.checkbox('Display complete missing functionalities'):
         # Convert DataFrame to HTML and display it
@@ -1464,6 +1476,9 @@ if dashboard == "Section 7: Time Management":
     href = f'<a href="data:file/csv;base64,{b64}" download="functionalities_missing.csv">Download functionalities_missing csv file</a>'
     st.markdown(href, unsafe_allow_html=True)
 
+############ SECTION 7 ENDS ############
+
+############ SECTION 8 STARTS ############
 if dashboard == "Section 8: User Experience":
     filtered_data = apply_filters(data, st.session_state['selected_role'], st.session_state['selected_function'],
                                   st.session_state['selected_location'])
@@ -1516,7 +1531,7 @@ if dashboard == "Section 8: User Experience":
     
     st.image(word_cloud_valuable.to_array(), use_column_width=True)
     
-
+    #################stay only in this dashboard start##################
     def extract_keyphrases(text):
         keywords = kw_model.extract_keywords(text, keyphrase_ngram_range=(2, 4), stop_words='english', use_maxsum=True, nr_candidates=20, top_n=1)
         return ', '.join([word for word, _ in keywords])
@@ -1576,6 +1591,7 @@ if dashboard == "Section 8: User Experience":
     b64_valauable = base64.b64encode(csv_valuable.encode()).decode()  # some strings <-> bytes conversions necessary here
     href_valuable = f'<a href="data:file/csv;base64,{b64_valauable}" download="most_valuable_activities.csv">Download most_valuable_activities csv file</a>'
     st.markdown(href_valuable, unsafe_allow_html=True)
+    #################stay only in this dashboard end##################
 
     ### Question63: In the context of your job, what do your current HRIS fail to address?
     st.markdown(
@@ -1606,6 +1622,7 @@ if dashboard == "Section 8: User Experience":
     #drop missing values first
     functions_missing = functions_missing.dropna()
 
+    #################stay only in this dashboard start##################
     #extract keywords from the text
     functions_missing_keywords = functions_missing.apply(extract_keyphrases)
 
@@ -1645,6 +1662,7 @@ if dashboard == "Section 8: User Experience":
     b64_functions = base64.b64encode(csv_functions.encode()).decode()  # some strings <-> bytes conversions necessary here
     href_functions = f'<a href="data:file/csv;base64,{b64_functions}" download="issues_in_HRIS.csv">Download issues_in_HRIS csv file</a>'
     st.markdown(href_functions, unsafe_allow_html=True)
+    #################stay only in this dashboard end##################
 
     #Column 72: In 3 words, how would you describe your experience with the current HRIS?
     st.markdown(
@@ -1700,6 +1718,7 @@ if dashboard == "Section 8: User Experience":
             unsafe_allow_html=True)
     st.image(phrase_cloud_overall.to_array(), use_column_width=True)
 
+    #################stay only in this dashboard start##################
     #sentiment analysis for overall experience with the current HRIS
 
     # Apply the function to the 72nd column
@@ -1790,6 +1809,8 @@ if dashboard == "Section 8: User Experience":
         fig_function2.update_yaxes(showticklabels=True, title='')
         fig_function2.update_xaxes(showticklabels=False, title='')
         st.plotly_chart(fig_function2, use_container_width=True, key="functions_bar_chart2")
+    
+    #################stay only in this dashboard end##################
 
     #check if the user wants to see the data
     if st.checkbox('Display complete description data in 3 words'):
