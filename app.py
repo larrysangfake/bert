@@ -1462,6 +1462,9 @@ if dashboard == "Section 8: User Experience":
     
     valuable_activities = filtered_data.iloc[:, 69]
 
+    #drop missing values first
+    valuable_activities = valuable_activities.dropna()
+
     #generate wordcloud since the repsonses are too few
     word_cloud_valuable = WordCloud(width=800, height=400, background_color='white', stopwords=HRIS_stopwords).generate(' '.join(valuable_activities.dropna().astype(str)))
 
@@ -1469,40 +1472,6 @@ if dashboard == "Section 8: User Experience":
     st.markdown('<h1 style="font-size:17px;font-family:Arial;color:#333333;">Wordcloud</h1>', unsafe_allow_html=True)
     st.image(word_cloud_valuable.to_array(), use_column_width=True)
     
-    #define ngrams
-    # Function to extract n-grams from text
-    def extract_ngrams(x, n):
-        ngrams = []
-        phrases = x.split(', ')
-        for phrase in phrases:
-            words = phrase.split(' ')
-            ngrams.extend([' '.join(ng) for ng in nltk_ngrams(words, n)])
-        return ngrams
-    
-    #drop missing values first
-    valuable_activities = valuable_activities.dropna()
-
-    all_valuable_activities = ' '.join(valuable_activities.astype(str))
-
-    # Generate unigrams, bigrams, and trigrams
-    unigrams_valuable = extract_ngrams(all_valuable_activities, 1)
-    bigrams_valuable = extract_ngrams(all_valuable_activities, 2)
-    trigrams_valuable = extract_ngrams(all_valuable_activities, 3)
-
-    # Count the frequency of each n-gram
-    unigram_freq_valuable = Counter(unigrams_valuable)
-    bigram_freq_valuable = Counter(bigrams_valuable)
-    trigram_freq_valuable = Counter(trigrams_valuable)
-
-    #combine the frequencies
-    ngram_freq_valuable = unigram_freq_valuable + bigram_freq_valuable + trigram_freq_valuable
-
-    #generate the first phrasecloud
-    phrase_cloud_valuable1 = WordCloud(width=800, height=400, background_color='white', stopwords=HRIS_stopwords).generate_from_frequencies(ngram_freq_valuable)
-
-    # Display the word cloud using Streamlit
-    st.markdown('<h1 style="font-size:17px;font-family:Arial;color:#333333;">Phrase Cloud</h1>', unsafe_allow_html=True)
-    st.image(phrase_cloud_valuable1.to_array(), use_column_width=True)
 
     def extract_keyphrases(text):
         keywords = kw_model.extract_keywords(text, keyphrase_ngram_range=(2, 4), stop_words='english', use_maxsum=True, nr_candidates=20, top_n=1)
@@ -1532,6 +1501,40 @@ if dashboard == "Section 8: User Experience":
     phrase_cloud_valuable = WordCloud(width=800, height=400, background_color='white', stopwords=HRIS_stopwords).generate_from_frequencies(bigram_freq_valuable)
 
     st.image(phrase_cloud_valuable.to_array(), use_column_width=True)
+
+    #define ngrams
+    # Function to extract n-grams from text
+    def extract_ngrams(x, n):
+        ngrams = []
+        phrases = x.split(', ')
+        for phrase in phrases:
+            words = phrase.split(' ')
+            ngrams.extend([' '.join(ng) for ng in nltk_ngrams(words, n)])
+        return ngrams
+    
+    # Concatenate all text data
+    all_valuable_activities = ' '.join(valuable_activities_keywords.astype(str))
+
+    # Generate unigrams, bigrams, and trigrams
+    unigrams_valuable = extract_ngrams(all_valuable_activities, 1)
+    bigrams_valuable = extract_ngrams(all_valuable_activities, 2)
+    trigrams_valuable = extract_ngrams(all_valuable_activities, 3)
+
+    # Count the frequency of each n-gram
+    unigram_freq_valuable = Counter(unigrams_valuable)
+    bigram_freq_valuable = Counter(bigrams_valuable)
+    trigram_freq_valuable = Counter(trigrams_valuable)
+
+    #combine the frequencies
+    ngram_freq_valuable = unigram_freq_valuable + bigram_freq_valuable + trigram_freq_valuable
+
+    #generate the first phrasecloud
+    phrase_cloud_valuable1 = WordCloud(width=800, height=400, background_color='white', stopwords=HRIS_stopwords).generate_from_frequencies(ngram_freq_valuable)
+
+    # Display the word cloud using Streamlit
+    st.markdown('<h1 style="font-size:17px;font-family:Arial;color:#333333;">Phrase Cloud</h1>', unsafe_allow_html=True)
+    st.image(phrase_cloud_valuable1.to_array(), use_column_width=True)
+
 
     st.write("what are the most valuable activities your current HRIS enable you to do")
     # Function to split and list phrases
