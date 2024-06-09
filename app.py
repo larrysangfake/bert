@@ -722,7 +722,7 @@ if dashboard == 'Section 4: Learning':
     improvement_and_missing = filtered_data.iloc[:, 35]
     improvement_and_missing = improvement_and_missing.dropna()
 
-    
+
 
     def extract_keyphrases(text):
         keywords = kw_model.extract_keywords(text, keyphrase_ngram_range=(2, 10), stop_words='english', use_maxsum=True, nr_candidates=20, top_n=3)
@@ -751,7 +751,9 @@ if dashboard == 'Section 4: Learning':
     phrase_cloud = WordCloud(width=800, height=400, background_color='white', stopwords=learning_stopwords).generate_from_frequencies(bigram_freq)
 
     # Display the word cloud using Streamlit
-    st.title('Phrase Cloud')
+    st.markdown(
+        "<h3 style='text-align: center; font-size: 20px; font-weight: normal;'>Phrase Cloud</h3>",
+        unsafe_allow_html=True)
     st.image(phrase_cloud.to_array(), use_column_width=True)
 
     # Function to split and list phrases
@@ -913,7 +915,7 @@ if dashboard == 'Section 5: Compensation':
     
 
     ### Qustion31: What data is missing according to you ?
-    st.title("Sentiment Analysis App")
+
 
     # Display the Data Missing for Compensation
     st.markdown('<h1 style="font-size:17px;font-family:Arial;color:#333333;">the improvement/missing format for learning management system</h1>', unsafe_allow_html=True)
@@ -952,7 +954,10 @@ if dashboard == 'Section 5: Compensation':
     phrase_cloud = WordCloud(width=800, height=400, background_color='white', stopwords=compensation_stopwords).generate_from_frequencies(bigram_freq)
 
     # Display the word cloud using Streamlit
-    st.title('Phrase Cloud')
+    st.markdown(
+        "<h3 style='text-align: center; font-size: 20px; font-weight: normal;'>Phrase Cloud</h3>",
+        unsafe_allow_html=True)
+    
     st.image(phrase_cloud.to_array(), use_column_width=True)
 
     # Function to split and list phrases
@@ -967,11 +972,11 @@ if dashboard == 'Section 5: Compensation':
     phrases = list_phrases(data_missing_keywords)
 
     # Convert to DataFrame and sort by phrase length
-    phrases_df = pd.DataFrame(phrases, columns=['Key Reasons']).sort_values(by='Key Reasons', key=lambda x: x.str.len())
-    phrases_df = phrases_df[phrases_df['Key Reasons'].str.strip() != '']
+    phrases_df = pd.DataFrame(phrases, columns=['Data Missing']).sort_values(by='Data Missing', key=lambda x: x.str.len())
+    phrases_df = phrases_df[phrases_df['Data Missing'].str.strip() != '']
 
     # Checkbox to decide whether to display the complete DataFrame
-    if st.checkbox('Display complete Key Reasons'):
+    if st.checkbox('Display data missing'):
         # Convert DataFrame to HTML and display it
         html = phrases_df.to_html(index=False)
         st.markdown(html, unsafe_allow_html=True)
@@ -979,7 +984,7 @@ if dashboard == 'Section 5: Compensation':
     # Convert DataFrame to CSV and generate download link
     csv = phrases_df.to_csv(index=False)
     b64 = base64.b64encode(csv.encode()).decode()  # some strings <-> bytes conversions necessary here
-    href = f'<a href="data:file/csv;base64,{b64}" download="Key_Reasons.csv">Download Key Reasons CSV File</a>'
+    href = f'<a href="data:file/csv;base64,{b64}" download="data_missing.csv">Download data_missing csv file</a>'
     st.markdown(href, unsafe_allow_html=True)
 
 if dashboard == 'Section 6: Payroll':
@@ -1102,13 +1107,12 @@ if dashboard == 'Section 6: Payroll':
         st.markdown(
             """
             <h2 style='font-size: 17px; font-family: Arial; color: #333333;'>
-            Can you share any specific features of your current system that you like/that made you choose it?
+            Any specific features of the current system that people like/that made people choose it?
             </h2>
             """,
             unsafe_allow_html=True
         )
 
-    st.title("Sentiment Analysis App")
 
     # Display the specific features of the current system that you like/that made you choose it
     st.markdown('<h1 style="font-size:17px;font-family:Arial;color:#333333;">specific features of your current system that you like/that made you choose it</h1>', unsafe_allow_html=True)
@@ -1122,7 +1126,10 @@ if dashboard == 'Section 6: Payroll':
     word_cloud = WordCloud(width=800, height=400, background_color='white', stopwords=features_stopwords).generate(' '.join(specific_features.dropna().astype(str)))
 
     # Display the word cloud using Streamlit
-    st.title('Word Cloud')
+    st.markdown(
+            "<h3 style='text-align: center; font-size: 20px; font-weight: normal;'>Word Cloud</h3>",
+            unsafe_allow_html=True)
+    
     st.image(word_cloud.to_array(), use_column_width=True)
     
     #Generate more complex wordcloud if there are more repsonses
@@ -1156,11 +1163,11 @@ if dashboard == 'Section 6: Payroll':
     phrase_cloud = WordCloud(width=800, height=400, background_color='white', stopwords=features_stopwords).generate_from_frequencies(bigram_freq)
 
     # Display the word cloud using Streamlit
-    st.title('Phrase Cloud')
+    st.markdown(
+        "<h3 style='text-align: center; font-size: 20px; font-weight: normal;'>Phrase Cloud</h3>",
+        unsafe_allow_html=True)
     st.image(phrase_cloud.to_array(), use_column_width=True)
 
-    st.write("All the specific features of the current system that you like/that made you choose it:")
-    st.write(specific_features)
 
     # Function to split and list phrases
     def list_phrases(dataframe):
@@ -1174,19 +1181,19 @@ if dashboard == 'Section 6: Payroll':
     phrases = list_phrases(specific_features_keywords)
 
     # Convert to DataFrame and sort by phrase length
-    phrases_df = pd.DataFrame(phrases, columns=['Key Reasons']).sort_values(by='Key Reasons', key=lambda x: x.str.len())
-    phrases_df = phrases_df[phrases_df['Key Reasons'].str.strip() != '']
+    phrases_df = pd.DataFrame(phrases, columns=['Key Features']).sort_values(by='Key Features', key=lambda x: x.str.len())
+    phrases_df = phrases_df[phrases_df['Key Features'].str.strip() != '']
 
     # Checkbox to decide whether to display the complete DataFrame
-    if st.checkbox('Display complete Key Reasons'):
+    if st.checkbox('Display complete specific features of the current system that people like/that made people choose it'):
         # Convert DataFrame to HTML and display it
-        html = phrases_df.to_html(index=False)
+        html = filtered_data.iloc[:,53].to_html(index=False)
         st.markdown(html, unsafe_allow_html=True)
 
     # Convert DataFrame to CSV and generate download link
-    csv = phrases_df.to_csv(index=False)
+    csv = filtered_data.iloc[:, 53].to_csv(index=False)
     b64 = base64.b64encode(csv.encode()).decode()  # some strings <-> bytes conversions necessary here
-    href = f'<a href="data:file/csv;base64,{b64}" download="Specific_Features.csv">Download Specific_Features CSV File</a>'
+    href = f'<a href="data:file/csv;base64,{b64}" download="specific_features.csv">Download specific_features CSV File</a>'
     st.markdown(href, unsafe_allow_html=True)
 
 if dashboard == "Section 7: Time Management":
@@ -1335,7 +1342,9 @@ if dashboard == "Section 7: Time Management":
     word_cloud = WordCloud(width=800, height=400, background_color='white').generate(' '.join(functionalities_missing.dropna().astype(str)))
 
     # Display the word cloud using Streamlit
-    st.title('Word Cloud')
+    st.markdown(
+            "<h3 style='text-align: center; font-size: 20px; font-weight: normal;'>Word Cloud</h3>",
+            unsafe_allow_html=True)
     st.image(word_cloud.to_array(), use_column_width=True)
     
     #Generate more complex wordcloud if there are more repsonses
@@ -1370,10 +1379,12 @@ if dashboard == "Section 7: Time Management":
     phrase_cloud = WordCloud(width=800, height=400, background_color='white', stopwords=functionalities_stopwords).generate_from_frequencies(bigram_freq)
 
     # Display the word cloud using Streamlit
-    st.title('Phrase Cloud')
+    st.markdown(
+            "<h3 style='text-align: center; font-size: 20px; font-weight: normal;'>Phrase Cloud</h3>",
+            unsafe_allow_html=True)
     st.image(phrase_cloud.to_array(), use_column_width=True)
 
-    st.write("what functionalities are missing from your current system")
+    st.markdown("<div style='font-size: 15px; font-family: Arial; color: #707070;'>All the functionalities missing from the current system:</div>", unsafe_allow_html=True)
     st.write(functionalities_missing)
 
     # Function to split and list phrases
@@ -1388,19 +1399,19 @@ if dashboard == "Section 7: Time Management":
     phrases = list_phrases(functionalities_missing_keywords)
 
     # Convert to DataFrame and sort by phrase length
-    phrases_df = pd.DataFrame(phrases, columns=['Key Reasons']).sort_values(by='Key Reasons', key=lambda x: x.str.len())
-    phrases_df = phrases_df[phrases_df['Key Reasons'].str.strip() != '']
+    phrases_df = pd.DataFrame(phrases, columns=['functionalities missing']).sort_values(by='functionalities missing', key=lambda x: x.str.len())
+    phrases_df = phrases_df[phrases_df['functionalities missing'].str.strip() != '']
 
     # Checkbox to decide whether to display the complete DataFrame
-    if st.checkbox('Display complete Key Reasons'):
+    if st.checkbox('Display complete missing functionalities'):
         # Convert DataFrame to HTML and display it
-        html = phrases_df.to_html(index=False)
+        html = filtered_data.iloc[:, 66].to_html(index=False)
         st.markdown(html, unsafe_allow_html=True)
 
     # Convert DataFrame to CSV and generate download link
-    csv = phrases_df.to_csv(index=False)
+    csv = filtered_data.iloc[:, 66].to_csv(index=False)
     b64 = base64.b64encode(csv.encode()).decode()  # some strings <-> bytes conversions necessary here
-    href = f'<a href="data:file/csv;base64,{b64}" download="Functionalities_missing.csv">Download Functionalities_Missing CSV File</a>'
+    href = f'<a href="data:file/csv;base64,{b64}" download="functionalities_missing.csv">Download functionalities_missing csv file</a>'
     st.markdown(href, unsafe_allow_html=True)
 
 if dashboard == "Section 8: User Experience":
@@ -1505,7 +1516,7 @@ if dashboard == "Section 8: User Experience":
     phrases_valuable_df = phrases_valuable_df[phrases_valuable_df['Key Activities'].str.strip() != '']
 
     # Checkbox to decide whether to display the complete DataFrame
-    if st.checkbox('Display all key phrases for Most Valuable Activities in the Current HRIS'):
+    if st.checkbox('Display all key phrases for most valuable activities in the current HRIS'):
         # Convert DataFrame to HTML and display it
         html = phrases_valuable_df.to_html(index=False)
         st.markdown(html, unsafe_allow_html=True)
@@ -1513,14 +1524,14 @@ if dashboard == "Section 8: User Experience":
     # Convert DataFrame to CSV and generate download link
     csv_valuable = phrases_valuable_df.to_csv(index=False)
     b64_valauable = base64.b64encode(csv_valuable.encode()).decode()  # some strings <-> bytes conversions necessary here
-    href_valuable = f'<a href="data:file/csv;base64,{b64_valauable}" download="Most_Valuable_Activities.csv">Download Most_Valuable_Activities CSV File</a>'
+    href_valuable = f'<a href="data:file/csv;base64,{b64_valauable}" download="most_valuable_activities.csv">Download most_valuable_activities csv file</a>'
     st.markdown(href_valuable, unsafe_allow_html=True)
 
     ### Question63: In the context of your job, what do your current HRIS fail to address?
     st.markdown(
         """
         <h2 style='font-size: 17px; font-family: Arial; color: #333333;'>
-        In the context of your job, what do your current HRIS fail to address?
+        In the context of the job, what does the current HRIS fail to address?
         </h2>
         """,
         unsafe_allow_html=True
@@ -1582,7 +1593,7 @@ if dashboard == "Section 8: User Experience":
     # Convert DataFrame to CSV and generate download link
     csv_functions = phrases_functions_df.to_csv(index=False)
     b64_functions = base64.b64encode(csv_functions.encode()).decode()  # some strings <-> bytes conversions necessary here
-    href_functions = f'<a href="data:file/csv;base64,{b64_functions}" download="Most_Functions_Missing.csv">Download Most_Functions_Missing CSV File</a>'
+    href_functions = f'<a href="data:file/csv;base64,{b64_functions}" download="issues_in_HRIS.csv">Download issues_in_HRIS csv file</a>'
     st.markdown(href_functions, unsafe_allow_html=True)
 
     #Column 72: In 3 words, how would you describe your experience with the current HRIS?
@@ -1731,7 +1742,7 @@ if dashboard == "Section 8: User Experience":
         st.plotly_chart(fig_function2, use_container_width=True, key="functions_bar_chart2")
 
     #check if the user wants to see the data
-    if st.checkbox('Display complete Description Data in 3 words'):
+    if st.checkbox('Display complete description data in 3 words'):
         # Convert DataFrame to HTML and display it
         html = filtered_data.iloc[:, 72].to_html(index=False)
         st.markdown(html, unsafe_allow_html=True)
@@ -1739,7 +1750,7 @@ if dashboard == "Section 8: User Experience":
     # Convert DataFrame to CSV and generate download link
     csv = filtered_data.iloc[:, 72].to_csv(index=False)
     b64 = base64.b64encode(csv.encode()).decode()  # some strings <-> bytes conversions necessary here
-    href = f'<a href="data:file/csv;base64,{b64}" download="User_Experience.csv">Download User_Experience CSV File</a>'
+    href = f'<a href="data:file/csv;base64,{b64}" download="user_experience.csv">Download user_experience csv file</a>'
     st.markdown(href, unsafe_allow_html=True)
 
 
