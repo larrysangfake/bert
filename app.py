@@ -620,12 +620,16 @@ if dashboard == 'Section 3: Performance & Talent':
     negative_reason_recruiting_counts['percentage'] = negative_reason_recruiting_counts['count'] / len(
         filtered_data) * 100
 
-    # Create a horizontal bar chart with Plotly
     fig1 = px.bar(negative_reason_recruiting_counts, y='negative_reasons', x='percentage', text='count',
                   color='negative_reasons', color_discrete_sequence=['#3b528b'], orientation='h')
 
-    # Customize the tooltip
     fig1.update_traces(hovertemplate='<b>Reason:</b> %{y}<br><b>Count:</b> %{text}')
+
+    # Set the y-axis title
+    fig1.update_yaxes(title_text='Reasons for Discomfort')
+
+    # Rotate the y-axis labels to be horizontal
+    fig1.update_layout(yaxis_tickangle=-90)
 
     # Show the chart
     st.plotly_chart(fig1, use_container_width=False)
