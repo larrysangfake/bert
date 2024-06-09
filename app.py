@@ -1560,7 +1560,7 @@ if dashboard == "Section 8: User Experience":
     overall_experience = filtered_data.iloc[:, 72]
 
     #set the stopwords
-    Overall_stopwords = [",", ";", "not very", "I", "my", "activities", "fail", "address", "missing", "HRIS", "valuable", "system", "HR", "current", "functionalities", "system", "payroll", "compensation", "miss", "missing", "this","about", "of", ",", "to", "a", "what", "on", "could", "do", "we", "their", "the", "learning", "management", "system", "employees", "company", "system", "like", "choose", "help", "need", "everyone", "makes", "improved", "improvement", "format", "today", "no", "and","should","more", "training", "data", "according", "you"]
+    Overall_stopwords = [",", ";", "not very", "not very " "I", "my", "activities", "fail", "address", "missing", "HRIS", "valuable", "system", "HR", "current", "functionalities", "system", "payroll", "compensation", "miss", "missing", "this","about", "of", ",", "to", "a", "what", "on", "could", "do", "we", "their", "the", "learning", "management", "system", "employees", "company", "system", "like", "choose", "help", "need", "everyone", "makes", "improved", "improvement", "format", "today", "no", "and","should","more", "training", "data", "according", "you"]
 
     # Function to extract n-grams from text
     def extract_ngrams(x, n):
@@ -1600,13 +1600,11 @@ if dashboard == "Section 8: User Experience":
     #sentiment analysis for overall experience with the current HRIS
     st.write("In 3 words, how would you describe your experience with the current HRIS?")
 
-    #Get sentiment result for each row
-    sentiment_result = filtered_data.apply(lambda x: sentiment_analyzer(filtered_data.iloc[:,72]))
-
-    st.write(sentiment_result)
+    filtered_data['sentiment_label'] = filtered_data.iloc[:, 72].apply(sentiment_analyzer)
+    st.write(filtered_data)
 
     #count the number of positive, negative and neutral sentiments
-    sentiment_count = sentiment_result.value_counts()
+    sentiment_count = filtered_data['sentiment_label'].value_counts()
 
     #create a horinzontal bar chart
     sentiment_ratio = 0.6
@@ -1624,9 +1622,9 @@ if dashboard == "Section 8: User Experience":
     with satisfaction_col:
         st.markdown('<div class="chart-container">', unsafe_allow_html=True)
         categories = ['Positive', 'Neutral', 'Negative']
-        sentiment_values = sentiment_result.value_counts()
+        
 
-        sentiment_df = pd.DataFrame({'Sentiment Level': categories, 'Count': sentiment_values.values})
+        sentiment_df = pd.DataFrame({'Sentiment Level': categories, 'Count': sentiment_count.values})
 
         # Display title
         title_html = f"<h2 style='font-size: 17px; font-family: Arial; color: #333333;'>Sentiment Analysis</h2>"
