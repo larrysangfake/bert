@@ -1601,7 +1601,7 @@ if dashboard == "Section 8: User Experience":
     st.write("In 3 words, how would you describe your experience with the current HRIS?")
 
     
-    @st.cache(allow_output_mutation=True)
+    @st.cache_resource
     def load_model():
         tokenizer = AutoTokenizer.from_pretrained("nlptown/bert-base-multilingual-uncased-sentiment")
         model = AutoModelForSequenceClassification.from_pretrained("nlptown/bert-base-multilingual-uncased-sentiment")
