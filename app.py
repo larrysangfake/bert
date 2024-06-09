@@ -1583,9 +1583,11 @@ if dashboard == "Section 8: User Experience":
     # Count the frequency of each bigram
     bigram_freq_overall = Counter(bigrams_overall)
 
-    # Generate the word cloud
-    phrase_cloud_overall = WordCloud(width=800, height=400, background_color='white', stopwords = HRIS_stopwords2).generate_from_frequencies(bigram_freq_overall)
+    # Convert bigrams from tuples to strings
+    bigram_freq_overall_str = { ' '.join(k): v for k, v in bigram_freq_overall.items() }
 
+    # Generate the word cloud
+    phrase_cloud_overall = WordCloud(width=800, height=400, background_color='white', stopwords = HRIS_stopwords2).generate_from_frequencies(bigram_freq_overall_str)
     # Display the word cloud using Streamlit
     st.title('Phrase Cloud for Overall Experience with the Current HRIS')
     st.image(phrase_cloud_overall.to_array(), use_column_width=True)
