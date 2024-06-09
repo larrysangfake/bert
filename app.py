@@ -1556,15 +1556,13 @@ if dashboard == "Section 8: User Experience":
     #Column 72: In 3 words, how would you describe your experience with the current HRIS?
     st.markdown('<h1 style="font-size:17px;font-family:Arial;color:#333333;">Overall Experience with the Current HRIS</h1>', unsafe_allow_html=True)
 
-    #sentiment analysis for overall experience with the current HRIS
-
     #get the data
     overall_experience = filtered_data.iloc[:, 72]
 
     # Function to extract bigrams from text
     def extract_bigrams3(text):
         tokens = nltk.word_tokenize(text)
-        bigrams = list(ngrams(tokens, 3))
+        bigrams = list(ngrams(tokens, 2))
         return [' '.join(bigram) for bigram in bigrams]
     
     #drop missing values first
