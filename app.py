@@ -622,7 +622,7 @@ if dashboard == 'Section 3: Performance & Talent':
 
     # Create a horizontal bar chart with Plotly
     fig1 = px.bar(negative_reason_recruiting_counts, y='negative_reasons', x='percentage', text='count',
-                  color='negative_reasons', color_discrete_sequence=['#FFA500'], orientation='h')
+                  color='negative_reasons', color_discrete_sequence=['#3b528b'], orientation='h')
 
     # Customize the tooltip
     fig1.update_traces(hovertemplate='<b>Reason:</b> %{y}<br><b>Count:</b> %{text}')
