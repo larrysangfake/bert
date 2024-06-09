@@ -13,7 +13,7 @@ import plotly.express as px
 import matplotlib.pyplot as plt
 from collections import Counter
 import nltk
-from nltk.util import ngrams
+from nltk.util import ngrams as nltk_ngrams
 
 
 nltk.download('punkt', quiet=True)
@@ -1565,13 +1565,10 @@ if dashboard == "Section 8: User Experience":
     # Function to extract n-grams from text
     def extract_ngrams(x, n):
         ngrams = []
-        # Split the phrases by comma and space
         phrases = x.split(', ')
         for phrase in phrases:
-            # Split the phrase into words
             words = phrase.split(' ')
-            # Generate n-grams for the words
-            ngrams.extend([' '.join(ng) for ng in ngrams(words, n)])
+            ngrams.extend([' '.join(ng) for ng in nltk_ngrams(words, n)])
         return ngrams
 
     
