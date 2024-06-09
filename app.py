@@ -1600,7 +1600,18 @@ if dashboard == "Section 8: User Experience":
     #sentiment analysis for overall experience with the current HRIS
     st.write("In 3 words, how would you describe your experience with the current HRIS?")
 
-    filtered_data['sentiment_label'] = filtered_data.iloc[:, 72].apply(sentiment_analyzer)
+    def get_sentiment_label(text):
+        analyzer = SentimentIntensityAnalyzer()
+        sentiment = analyzer.polarity_scores(text)
+        compound = sentiment['compound']
+        if compound >= 0.05:
+            return 'positive'
+        elif compound <= -0.05:
+            return 'negative'
+        else:
+            return 'neutral'
+
+    filtered_data['sentiment_label'] = filtered_data.iloc[:, 72].apply(get_sentiment_label)
     st.write(filtered_data)
 
     #count the number of positive, negative and neutral sentiments
