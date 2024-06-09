@@ -1447,10 +1447,7 @@ if dashboard == "Section 8: User Experience":
     #generate wordcloud since the repsonses are too few
     word_cloud_valuable = WordCloud(width=800, height=400, background_color='white', stopwords=HRIS_stopwords).generate(' '.join(valuable_activities.dropna().astype(str)))
 
-    # Display the most valuable activities in the current HRIS
-    st.markdown(
-        "<h1 style='text-align: center; font-size: 24px; font-weight: normal;'>Most Valuable Activities in the Current HRIS</h1>",
-        unsafe_allow_html=True)
+
     
     st.markdown(
             "<h3 style='text-align: center; font-size: 20px; font-weight: normal;'>Word Cloud</h3>",
@@ -1598,8 +1595,7 @@ if dashboard == "Section 8: User Experience":
         unsafe_allow_html=True
     )
 
-    st.markdown("<div style='font-size: 15px; font-family: Arial; color: #707070;'>Overall Experience with the HRIS Experience</div>", unsafe_allow_html=True)
-
+    st.markdown("<h1 style='text-align: center; font-size: 24px; font-weight: normal;'>Descriptions about User Experience with the Current HRIS</h1>", unsafe_allow_html=True)
     #get the data
     overall_experience = filtered_data.iloc[:, 72]
 
@@ -1645,10 +1641,10 @@ if dashboard == "Section 8: User Experience":
 
     #sentiment analysis for overall experience with the current HRIS
 
-
-
-
-    #count the number of positive, negative and neutral sentiments
+    # Apply the function to the 72nd column
+    filtered_data['star_rating'] = filtered_data.iloc[:, 72].apply(lambda text: predict_star_rating(text, tokenizer, model))
+    
+    #count the number of 1-5 star rating predictions
     sentiment_count = filtered_data['star_rating'].value_counts()
 
     # Display the sentiment count   
@@ -1746,7 +1742,7 @@ if dashboard == "Section 8: User Experience":
     href = f'<a href="data:file/csv;base64,{b64}" download="User_Experience.csv">Download User_Experience CSV File</a>'
     st.markdown(href, unsafe_allow_html=True)
 
-    
+
 
 
 
