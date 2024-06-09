@@ -1480,7 +1480,7 @@ if dashboard == "Section 8: User Experience":
     phrases_valuable_df = phrases_valuable_df[phrases_valuable_df['Key Reasons'].str.strip() != '']
 
     # Checkbox to decide whether to display the complete DataFrame
-    if st.checkbox('Display complete Key Reasons'):
+    if st.checkbox('Display all key phrases for Most Valuable Activities in the Current HRIS'):
         # Convert DataFrame to HTML and display it
         html = phrases_valuable_df.to_html(index=False)
         st.markdown(html, unsafe_allow_html=True)
@@ -1542,7 +1542,7 @@ if dashboard == "Section 8: User Experience":
     phrases_functions_df = phrases_functions_df[phrases_functions_df['Key Reasons'].str.strip() != '']
 
     # Checkbox to decide whether to display the complete DataFrame
-    if st.checkbox('Display complete Key Reasons'):
+    if st.checkbox('Display complete Key Phrases for Most Functions Missing in the Current HRIS'):
         # Convert DataFrame to HTML and display it
         html = phrases_functions_df.to_html(index=False)
         st.markdown(html, unsafe_allow_html=True)
