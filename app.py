@@ -1,7 +1,7 @@
 import base64
 import streamlit as st
 import numpy as np
-from transformers import BertTokenizer, BertForSequenceClassification
+from transformers import BertTokenizer, BertForSequenceClassification, AutoTokenizer, AutoModelForSequenceClassification
 from transformers import pipeline
 import torch
 import pandas as pd
@@ -264,22 +264,63 @@ def generate_wordclouds(df, score_col_idx, reasons_col_idx, custom_stopwords):
         ax_low_scores.axis('off')
         st.pyplot(fig_low_scores)
 
+@st.cache_resource
+def load_sentiment_analyzer():
+    return pipeline("sentiment-analysis")
+
+@st.cache_resource
+def load_star_rating_model():
+    tokenizer = AutoTokenizer.from_pretrained("nlptown/bert-base-multilingual-uncased-sentiment")
+    model = AutoModelForSequenceClassification.from_pretrained("nlptown/bert-base-multilingual-uncased-sentiment")
+    return tokenizer, model
+
+@st.cache_resource
+def load_keyword_extractor():
+    return KeyBERT()
+
+# Functions for prediction
 def get_transformer_sentiment(text):
     result = sentiment_analyzer(text)[0]
     return result['score'] if result['label'] == 'POSITIVE' else -result['score']
-    
-    # Function to extract keywords using KeyBERT
+
+def predict_star_rating(text, tokenizer, model):
+    inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True, max_length=512)
+    outputs = model(**inputs)
+    probabilities = torch.nn.functional.softmax(outputs.logits, dim=-1)
+    star_rating = torch.argmax(probabilities, dim=1).item() + 1
+    return star_rating
+
 def extract_keywords(text):
     keywords = kw_model.extract_keywords(text, keyphrase_ngram_range=(1, 3), stop_words='english', use_maxsum=True, nr_candidates=20, top_n=5)
     return ', '.join([word for word, _ in keywords])
 
+# Load models
+sentiment_analyzer = load_sentiment_analyzer()
+tokenizer, model = load_star_rating_model()
+kw_model = load_keyword_extractor()
 
-@st.cache(allow_output_mutation=True)
-def get_sentiment_analyzer():
-    return pipeline("sentiment-analysis")
-# Usage
-sentiment_analyzer = get_sentiment_analyzer()
-kw_model = KeyBERT()
+# Streamlit app layout
+st.title("Text Analysis with Transformers")
+
+user_input = st.text_area("Enter your text here:")
+
+if st.button("Analyze"):
+    if user_input:
+        # Sentiment analysis
+        sentiment_score = get_transformer_sentiment(user_input)
+        st.write(f"Sentiment Score: {sentiment_score}")
+
+        # Star rating prediction
+        star_rating = predict_star_rating(user_input, tokenizer, model)
+        st.write(f"Star Rating: {star_rating} ⭐")
+
+        # Keyword extraction
+        keywords = extract_keywords(user_input)
+        st.write(f"Extracted Keywords: {keywords}")
+    else:
+        st.write("Please enter some text to analyze.")
+
+
 
 ############ SENTIMENT ANALYSIS FUNCTION ENDS ############
 
@@ -1601,22 +1642,7 @@ if dashboard == "Section 8: User Experience":
     st.write("In 3 words, how would you describe your experience with the current HRIS?")
 
     
-    model_name = "nlptown/bert-base-multilingual-uncased-sentiment"
-
-    # Load the pipeline for sentiment classification
-    classifier = pipeline("text-classification", model=model_name)
-
-    # Function to perform sentiment classification on each row
-    def classify_sentiment(text):
-        prediction = classifier(text)
-        return prediction  # Assuming we're only interested in the first result
-
-    # Apply sentiment classification to each row
-    df_sentiments4 = filtered_data['In 3 words, how would you describe your current user-experience with the HRIS\xa0?'].apply(classify_sentiment)
-
-    # Display the DataFrame with sentiment classification results
-    st.write(df_sentiments4)
-
+    
 
     filtered_data['sentiment_label'] = filtered_data.iloc[:, 72].apply(get_sentiment_label)
     st.write(filtered_data)
