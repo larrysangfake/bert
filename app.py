@@ -628,6 +628,9 @@ if dashboard == 'Section 3: Performance & Talent':
     # Set the y-axis title
     fig1.update_yaxes(title_text='Reasons for Discomfort')
 
+    # Remove the legend
+    fig1.update_layout(showlegend=False)
+
     # Show the chart
     st.plotly_chart(fig1, use_container_width=False)
 
