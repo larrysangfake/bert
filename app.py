@@ -257,25 +257,31 @@ def generate_wordclouds(df, score_col_idx, reasons_col_idx, custom_stopwords):
     text_low_scores = ' '.join(df_low_scores.iloc[:, reasons_col_idx].astype(str))
 
     # Generate the word clouds
-    wordcloud_high_scores = WordCloud(width=800, height=400, background_color='white', stopwords=stopwords_set, collocations=False).generate(text_high_scores)
-    wordcloud_low_scores = WordCloud(width=800, height=400, background_color='white', stopwords=stopwords_set, collocations=False).generate(text_low_scores)
+    wordcloud_high_scores = WordCloud(width=800, height=400, background_color='white', stopwords=stopwords_set,
+                                      collocations=False).generate(text_high_scores)
+    wordcloud_low_scores = WordCloud(width=800, height=400, background_color='white', stopwords=stopwords_set,
+                                     collocations=False).generate(text_low_scores)
 
     # Create columns for displaying the word clouds side by side
     col1, col2 = st.columns(2)
 
     with col1:
-        st.markdown("<h3 style='text-align: center; font-size: 20px; font-weight: normal;'>Word Cloud for High Scores</h3>", unsafe_allow_html=True)
-        fig_high_scores, ax_high_scores = plt.subplots(figsize=(10, 5))
-        ax_high_scores.imshow(wordcloud_high_scores, interpolation='bilinear')
-        ax_high_scores.axis('off')
-        st.pyplot(fig_high_scores)
-
-    with col2:
-        st.markdown("<h3 style='text-align: center; font-size: 20px; font-weight: normal;'>Word Cloud for Low Scores</h3>", unsafe_allow_html=True)
+        st.markdown(
+            "<h3 style='text-align: center; font-size: 20px; font-weight: normal;'>Word Cloud for Low Scores</h3>",
+            unsafe_allow_html=True)
         fig_low_scores, ax_low_scores = plt.subplots(figsize=(10, 5))
         ax_low_scores.imshow(wordcloud_low_scores, interpolation='bilinear')
         ax_low_scores.axis('off')
         st.pyplot(fig_low_scores)
+
+    with col2:
+        st.markdown(
+            "<h3 style='text-align: center; font-size: 20px; font-weight: normal;'>Word Cloud for High Scores</h3>",
+            unsafe_allow_html=True)
+        fig_high_scores, ax_high_scores = plt.subplots(figsize=(10, 5))
+        ax_high_scores.imshow(wordcloud_high_scores, interpolation='bilinear')
+        ax_high_scores.axis('off')
+        st.pyplot(fig_high_scores)
 
 @st.cache_resource
 def load_sentiment_analyzer():
