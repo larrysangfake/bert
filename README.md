@@ -21,8 +21,7 @@ To install the necessary packages, run:
 pip install -r requirements.txt
 ```
 ## Usage
-Once the application is running, you can upload survey data files (CSV, PDF, TXT, XLSX) via the sidebar. The chatbot will process the data and provide insights based on your queries. You can interact with the chatbot to explore data trends, perform sentiment analysis, etc.
-
+Once the application is running, you can upload survey data files (CSV, PDF, TXT, XLSX) via the sidebar. This section provides the sentiment analysis of the data.
 ## Contributors
 Linhui Sang
 
