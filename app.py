@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 from collections import Counter
 import nltk
 from nltk.util import ngrams as nltk_ngrams
+import plotly.graph_objects as go
 
 
 nltk.download('punkt', quiet=True)
