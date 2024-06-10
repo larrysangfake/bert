@@ -340,17 +340,90 @@ if dashboard == 'Section 1: Employee Experience':
         unsafe_allow_html=True
     )
 
+
+    # Question 4: What HR processes do you interact with the most in your day-to-day work ?
+    q4_data = pd.DataFrame({
+        'ID': filtered_data['ID'],
+        'HR_Process': filtered_data['What HR processes do you interact with the most in your day-to-day work ?']
+    })
+    # Remove the last semicolon from each HR_Process value
+    q4_data['HR_Process'] = q4_data['HR_Process'].str.rstrip(';')
+    # Splitting the HR_Process values into separate lists of processes
+    q4_data['HR_Process'] = q4_data['HR_Process'].str.split(';')
+    # Explode the lists into separate rows while maintaining the corresponding ID
+    q4_processed = q4_data.explode('HR_Process')
+    # Reset index to maintain the original ID
+    q4_processed.reset_index(drop=True, inplace=True)
+    q4_count = q4_processed.groupby('HR_Process').size().reset_index(name='Count')
+
+    # Question 5: In what areas do you think HR could improve its capabilities to enhance how they deliver services and support you ?
+    q5_data = pd.DataFrame({
+        'ID': filtered_data['ID'],
+        'Improve_Area': filtered_data[
+            'In what areas do you think HR could improve its capabilities to enhance how they deliver services and support you ?']
+    })
+    # Remove the last semicolon from each value
+    q5_data['Improve_Area'] = q5_data['Improve_Area'].str.rstrip(';')
+    # Splitting the values into separate lists of processes
+    q5_data['Improve_Area'] = q5_data['Improve_Area'].str.split(';')
+    # Explode the lists into separate rows while maintaining the corresponding ID
+    q5_processed = q5_data.explode('Improve_Area')
+    # Reset index to maintain the original ID
+    q5_processed.reset_index(drop=True, inplace=True)
+    q5_count = q5_processed.groupby('Improve_Area').size().reset_index(name='Count')
+
+    # Question 4 and 5 combined
+    # Merge the two dataset on function
+    # Merge datasets by matching HR_Process and Improve_Area
+    q4_q5_count = pd.merge(q4_count, q5_count, left_on='HR_Process', right_on='Improve_Area', how='outer')
+    # Drop unnecessary columns
+    q4_q5_count.drop(['Improve_Area'], axis=1, inplace=True)
+    q4_q5_count.rename(
+        columns={'HR_Process': 'HR Function', 'Count_x': 'HR_Process_Interacted', 'Count_y': 'Improvement_Areas'},
+        inplace=True)
+    q4_q5_count.sort_values('HR_Process_Interacted', ascending=False, inplace=True)
+    # Separate 'None' row from the DataFrame
+    none_row = q4_q5_count[q4_q5_count['HR Function'] == 'None']
+    q4_q5_count = q4_q5_count[q4_q5_count['HR Function'] != 'None']
+
+    # Sort 'HR_Process_Interacted' in descending order
+    q4_q5_count.sort_values(by='HR_Process_Interacted', ascending=True, inplace=True)
+
+    # Append 'None' row at the end
+    q4_q5_count = pd.concat([none_row, q4_q5_count])
+    # Reshape data into tidy format
+    df_tidy = q4_q5_count.melt(id_vars='HR Function', var_name='Type', value_name='Count')
+
+    # Question 7: How do you access HR Information ?
+    q7_data = pd.DataFrame({'device': filtered_data["How do you access HR Information ?"]})
+    q7_data['device'] = q7_data['device'].str.rstrip(';').str.split(';')
+    q7_data = q7_data.explode('device')
+    q7_data.dropna(inplace=True)
+    # Count the occurrences of each device
+    device_counts = q7_data['device'].value_counts().reset_index()
+    device_counts.columns = ['device', 'count']
+    # Calculate percentage
+    device_counts['percentage'] = device_counts['count'] /len(q7_data) * 100
+
     satisfaction_ratio = 0.6
     barcharts_ratio = 1 - satisfaction_ratio
     satisfaction_col, barcharts_col = st.columns([satisfaction_ratio, barcharts_ratio])
-    
+
+    st.markdown("""
+        <style>
+        .chart-container {
+            padding-top: 20px;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+
     with satisfaction_col:
         st.markdown('<div class="chart-container">', unsafe_allow_html=True)
         categories = ['Very Dissatisfied', 'Dissatisfied', 'Neutral', 'Satisfied', 'Very Satisfied']
-        q11ValuesCount, q11MedianScore = score_distribution(filtered_data, 13)
+        q6ValuesCount, q6MedianScore = score_distribution(filtered_data, 11)
 
-        ratings_df = pd.DataFrame({'Satisfaction Level': categories, 'Percentage': q11ValuesCount.values})
-        
+        ratings_df = pd.DataFrame({'Satisfaction Level': categories, 'Percentage': q6ValuesCount.values})
+
         # Define the order of the categories
         satisfaction_order = ['Very Satisfied', 'Satisfied', 'Neutral', 'Dissatisfied', 'Very Dissatisfied']
 
@@ -360,6 +433,83 @@ if dashboard == 'Section 1: Employee Experience':
         # Sort the DataFrame by 'Satisfaction Level'
         ratings_df.sort_values('Satisfaction Level', inplace=True)
 
+        # Display title and median score
+        title_html = f"<h2 style='font-size: 17px; font-family: Arial; color: #333333;'>Overall Rating on HR Services and Support</h2>"
+        caption_html = f"<div style='font-size: 15px; font-family: Arial; color: #707070;'>The median satisfaction score is {q6MedianScore:.1f}</div>"
+        st.markdown(title_html, unsafe_allow_html=True)
+        st.markdown(caption_html, unsafe_allow_html=True)
+
+        # Create a horizontal bar chart with Plotly
+        fig = px.bar(ratings_df, y='Satisfaction Level', x='Percentage', text='Percentage',
+                     orientation='h',
+                     color='Satisfaction Level', color_discrete_map={
+                'Very Dissatisfied': '#440154',  # Dark purple
+                'Dissatisfied': '#3b528b',  # Dark blue
+                'Neutral': '#21918c',  # Cyan
+                'Satisfied': '#5ec962',  # Light green
+                'Very Satisfied': '#fde725'  # Bright yellow
+            })
+
+        # Remove legend and axes titles
+        fig.update_layout(showlegend=False, xaxis_visible=False, xaxis_title=None, yaxis_title=None, autosize=True,
+                          height=300, margin=dict(l=20, r=20, t=30, b=20))
+
+        # Format text on bars
+        fig.update_traces(texttemplate='%{x:.1f}%', textposition='outside')
+        fig.update_xaxes(range=[0, max(ratings_df['Percentage']) * 1.1])
+
+        # Improve layout aesthetics
+        fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide')
+
+        # Use Streamlit to display the Plotly chart
+        st.plotly_chart(fig, use_container_width=True, key="overall_rating_bar_chart")
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    with barcharts_col:
+        satisfaction_options = ['Select a satisfaction level', 'Very Dissatisfied', 'Dissatisfied', 'Neutral',
+                                'Satisfied', 'Very Satisfied']
+        satisfaction_dropdown1 = st.selectbox('', satisfaction_options,
+                                              key='satisfaction_dropdown1')
+
+        satisfaction_filtered_data1 = filter_by_satisfaction(filtered_data, satisfaction_dropdown1, 11)
+
+        location_summary1, role_summary1, function_summary1 = prepare_summaries(satisfaction_filtered_data1)
+        left_margin = 150
+        total_height = 310
+        role_chart_height = total_height * 0.45
+        function_chart_height = total_height * 0.55
+
+        fig_role1 = px.bar(role_summary1, y='Role', x='Count', orientation='h')
+        fig_role1.update_layout(title="by Role", margin=dict(l=left_margin, r=0, t=50, b=0),
+                                height=role_chart_height, showlegend=False)
+        fig_role1.update_traces(marker_color='#336699', text=role_summary1['Count'], textposition='outside')
+        fig_role1.update_yaxes(showticklabels=True, title='')
+        fig_role1.update_xaxes(showticklabels=False, title='')
+        st.plotly_chart(fig_role1, use_container_width=True, key="roles_bar_chart1")
+
+        fig_function1 = px.bar(function_summary1, y='Function', x='Count', orientation='h')
+        fig_function1.update_layout(title="by Function", margin=dict(l=left_margin, r=0, t=50, b=0),
+                                    height=function_chart_height, showlegend=False)
+        fig_function1.update_traces(marker_color='#336699', text=function_summary1['Count'], textposition='outside')
+        fig_function1.update_yaxes(showticklabels=True, title='')
+        fig_function1.update_xaxes(showticklabels=False, title='')
+        st.plotly_chart(fig_function1, use_container_width=True, key="functions_bar_chart1")
+
+    with satisfaction_col:
+        st.markdown('<div class="chart-container">', unsafe_allow_html=True)
+        categories = ['Very Dissatisfied', 'Dissatisfied', 'Neutral', 'Satisfied', 'Very Satisfied']
+        q11ValuesCount, q11MedianScore = score_distribution(filtered_data, 13)
+
+        ratings_df = pd.DataFrame({'Satisfaction Level': categories, 'Percentage': q11ValuesCount.values})
+
+        # Define the order of the categories
+        satisfaction_order = ['Very Satisfied', 'Satisfied', 'Neutral', 'Dissatisfied', 'Very Dissatisfied']
+
+        # Convert 'Satisfaction Level' to a categorical variable with the specified order
+        ratings_df['Satisfaction Level'] = pd.Categorical(ratings_df['Satisfaction Level'], categories=satisfaction_order, ordered=True)
+
+        # Sort the DataFrame by 'Satisfaction Level'
+        ratings_df.sort_values('Satisfaction Level', inplace=True)        
 
         # Display title and median score
         title_html = f"<h2 style='font-size: 17px; font-family: Arial; color: #333333;'>Rating on HR Communication Channels</h2>"
@@ -420,6 +570,76 @@ if dashboard == 'Section 1: Employee Experience':
         fig_function2.update_yaxes(showticklabels=True, title='')
         fig_function2.update_xaxes(showticklabels=False, title='')
         st.plotly_chart(fig_function2, use_container_width=True, key="functions_bar_chart2")
+
+    # Define colors for each device
+    colors = {'Computer': '#440154', 'Mobile': '#5ec962', 'Tablet': '#3b528b'}
+
+    # Set up space for two visualizations
+    fig_q4_ratio = 0.65
+    fig_q7_ratio = 1 - fig_q4_ratio
+    q4_col, q7_col = st.columns([fig_q4_ratio, fig_q7_ratio])
+
+    with q4_col:
+        # Plot for HR Processes in the first column
+        fig_q4 = go.Figure(data=[
+            go.Bar(
+                name='Improvement Areas',
+                y=df_tidy[df_tidy['Type'] == 'Improvement_Areas']['HR Function'],
+                # make it horizontal bar chart to show texts completely
+                x=df_tidy[df_tidy['Type'] == 'Improvement_Areas']['Count'],
+                # make it horizontal bar chart to show texts completely
+                marker_color='#3b528b',
+                orientation='h'  # make it horizontal bar chart to show texts completely
+            ),
+            go.Bar(
+                name='Employee Interaction',
+                y=df_tidy[df_tidy['Type'] == 'HR_Process_Interacted']['HR Function'],
+                # make it horizontal bar chart to show texts completely
+                x=df_tidy[df_tidy['Type'] == 'HR_Process_Interacted']['Count'],
+                # make it horizontal bar chart to show texts completely
+                marker_color='#5ec962',
+                orientation='h'  # make it horizontal bar chart to show texts completely
+            )
+        ])
+        fig_q4.update_layout(
+            title='HR Processes: Employee Interaction vs Improvement Areas',
+            title_font=dict(size=17, family="Arial", color='#333333'),
+            xaxis_title='Number of Respondents',
+            yaxis_title='HR Process',
+            barmode='group',
+            annotations=[
+                dict(
+                    xref='paper', yref='paper', x=0, y=1.1,
+                    xanchor='left', yanchor='top',
+                    text="<i>Each respondent is able to select more than one HR process</i>",
+                    font=dict(family='Arial', size=12, color='#707070'),
+                    showarrow=False)
+            ],
+            legend=dict(
+                orientation="h",
+                x=0.5,
+                xanchor="center",
+                y=-0.2,
+                yanchor="top"
+            ),
+            margin=dict(l=22, r=20, t=70, b=70)
+        )
+        st.plotly_chart(fig_q4, use_container_width=True)
+
+    # Plot for Device Usage in the second column
+    with q7_col:
+        fig_q7 = px.bar(device_counts, x='percentage', y='device', text='percentage', orientation='h', color='device',
+                        color_discrete_map=colors)
+        fig_q7.update_layout(
+            title='Devices Used to Access HR Information',
+            title_font=dict(size=17, family="Arial", color='#333333'),
+            xaxis={'visible': False, 'showticklabels': False},
+            yaxis_title=None,
+            showlegend=False
+        )
+        fig_q7.update_traces(texttemplate='%{text:.0f}%', textposition='outside')
+        st.plotly_chart(fig_q7, use_container_width=True)
+
     
     # Question 9: Which reason(s) drive that score ?
 
