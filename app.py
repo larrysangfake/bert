@@ -279,7 +279,7 @@ def generate_wordclouds(df, score_col_idx, reasons_col_idx, custom_stopwords):
 
 @st.cache_resource
 def load_sentiment_analyzer():
-    return pipeline("sentiment-analysis", , model="distilbert/distilbert-base-uncased-finetuned-sst-2-english", revision="af0f99b")
+    return pipeline("sentiment-analysis", model="distilbert/distilbert-base-uncased-finetuned-sst-2-english", revision="af0f99b")
 
 @st.cache_resource
 def load_star_rating_model():
