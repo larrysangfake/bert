@@ -1609,7 +1609,7 @@ if dashboard == 'Section 6: Payroll':
     # Checkbox to decide whether to display the complete DataFrame
     if st.checkbox('Display complete specific features of the current system that people like/that made people choose it'):
         # Convert DataFrame to HTML and display it
-        html = specific_features.to_frame.to_html(index=False)
+        html = specific_features.to_frame().to_html(index=False)
         st.markdown(html, unsafe_allow_html=True)
 
     # Convert DataFrame to CSV and generate download link
@@ -1844,7 +1844,7 @@ if dashboard == "Section 7: Time Management":
     # Checkbox to decide whether to display the complete DataFrame
     if st.checkbox('Display complete missing functionalities'):
         # Convert DataFrame to HTML and display it
-        html = functionalities_missing.to_frame.to_html(index=False)
+        html = functionalities_missing.to_frame().to_html(index=False)
         st.markdown(html, unsafe_allow_html=True)
 
     # Convert DataFrame to CSV and generate download link
@@ -2203,7 +2203,7 @@ if dashboard == "Section 8: User Experience":
     #check if the user wants to see the data
     if st.checkbox('Display complete description data in 3 words'):
         # Convert DataFrame to HTML and display it
-        html = filtered_data.iloc[:, 72].notna.to_frame.to_html(index=False)
+        html = filtered_data.iloc[:, 72].to_frame().to_html(index=False)
         st.markdown(html, unsafe_allow_html=True)
 
     # Convert DataFrame to CSV and generate download link
