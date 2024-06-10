@@ -232,6 +232,9 @@ def filter_by_satisfaction(data, satisfaction_level, column_index):
         data = data[data.iloc[:, column_index] == satisfaction_options.index(satisfaction_level)]
     return data
 
+comfort_options = ['Select a comfort level', 'Very Uncomfortable', 'Uncomfortable', 'Hesitant',
+                           'Comfortable', 'Very Comfortable']
+
 def filter_by_comfort(data, comfort_level, column_index):
     if comfort_level != 'Select a comfort level':
         data = data[data.iloc[:, column_index] == comfort_options.index(comfort_level)]
@@ -276,7 +279,7 @@ def generate_wordclouds(df, score_col_idx, reasons_col_idx, custom_stopwords):
 
 @st.cache_resource
 def load_sentiment_analyzer():
-    return pipeline("sentiment-analysis")
+    return pipeline("sentiment-analysis", , model="distilbert/distilbert-base-uncased-finetuned-sst-2-english", revision="af0f99b")
 
 @st.cache_resource
 def load_star_rating_model():
@@ -341,6 +344,16 @@ if dashboard == 'Section 1: Employee Experience':
         q11ValuesCount, q11MedianScore = score_distribution(filtered_data, 13)
 
         ratings_df = pd.DataFrame({'Satisfaction Level': categories, 'Percentage': q11ValuesCount.values})
+        
+        # Define the order of the categories
+        satisfaction_order = ['Very Satisfied', 'Satisfied', 'Neutral', 'Dissatisfied', 'Very Dissatisfied']
+
+        # Convert 'Satisfaction Level' to a categorical variable with the specified order
+        ratings_df['Satisfaction Level'] = pd.Categorical(ratings_df['Satisfaction Level'], categories=satisfaction_order, ordered=True)
+
+        # Sort the DataFrame by 'Satisfaction Level'
+        ratings_df.sort_values('Satisfaction Level', inplace=True)
+
 
         # Display title and median score
         title_html = f"<h2 style='font-size: 17px; font-family: Arial; color: #333333;'>Rating on HR Communication Channels</h2>"
@@ -492,6 +505,16 @@ if dashboard == 'Section 3: Performance & Talent':
         q19ValuesCount, q19MedianScore = score_distribution(filtered_data, 26)
 
         ratings_df = pd.DataFrame({'Satisfaction Level': categories, 'Percentage': q19ValuesCount.values})
+        
+        # Define the order of the categories
+        satisfaction_order = ['Very Satisfied', 'Satisfied', 'Neutral', 'Dissatisfied', 'Very Dissatisfied']
+
+        # Convert 'Satisfaction Level' to a categorical variable with the specified order
+        ratings_df['Satisfaction Level'] = pd.Categorical(ratings_df['Satisfaction Level'], categories=satisfaction_order, ordered=True)
+
+        # Sort the DataFrame by 'Satisfaction Level'
+        ratings_df.sort_values('Satisfaction Level', inplace=True)
+
 
         # Display title and median score
         title_html = f"<h2 style='font-size: 17px; font-family: Arial; color: #333333;'>Rating on Company's Performance Evaluation and Feedback Process</h2>"
@@ -613,6 +636,15 @@ if dashboard == 'Section 3: Performance & Talent':
         q21ValuesCount, q21MedianScore = score_distribution(filtered_data, 28)
 
         ratings_df = pd.DataFrame({'Comfort Level': categories, 'Percentage': q21ValuesCount.values})
+        
+        #Define the order of the categories
+        comfort_order = ['Very Comfortable', 'Comfortable', 'Hesitant', 'Uncomfortable', 'Very Uncomfortable']
+
+        # Convert 'Comfort Level' to a categorical variable with the specified order
+        ratings_df['Comfort Level'] = pd.Categorical(ratings_df['Comfort Level'], categories=comfort_order, ordered=True)
+
+        # Sort the DataFrame by 'Comfort Level'
+        ratings_df.sort_values('Comfort Level', inplace=True)
 
         # Display title and median score
         title_html = f"<h2 style='font-size: 17px; font-family: Arial; color: #333333;'>Comfort Level in Discussing Career Goals         and Development with Manager</h2>"
@@ -697,7 +729,7 @@ if dashboard == 'Section 3: Performance & Talent':
     negative_reason_recruiting_counts['percentage'] = negative_reason_recruiting_counts['count'] / len(
         filtered_data) * 100
 
-    fig1 = px.bar(negative_reason_recruiting_counts, y='negative_reasons', x='percentage', text='count',
+    fig1 = px.bar(negative_reason_recruiting_counts, y='negative_reasons', x='percentage', text='percentage',
                   color='negative_reasons', color_discrete_sequence=['#3b528b'], orientation='h')
 
     fig1.update_traces(hovertemplate='<b>Reason:</b> %{y}<br><b>Count:</b> %{text}')
@@ -750,6 +782,16 @@ if dashboard == 'Section 4: Learning':
         q24ValuesCount, q24MedianScore = score_distribution(filtered_data, 31)
 
         ratings_df = pd.DataFrame({'Satisfaction Level': categories, 'Percentage': q24ValuesCount.values})
+
+        # Define the order of the categories
+        satisfaction_order = ['Very Satisfied', 'Satisfied', 'Neutral', 'Dissatisfied', 'Very Dissatisfied']
+
+        # Convert 'Satisfaction Level' to a categorical variable with the specified order
+        ratings_df['Satisfaction Level'] = pd.Categorical(ratings_df['Satisfaction Level'], categories=satisfaction_order, ordered=True)
+
+        # Sort the DataFrame by 'Satisfaction Level'
+        ratings_df.sort_values('Satisfaction Level', inplace=True)
+
 
         # Display title and median score
         title_html = f"<h2 style='font-size: 17px; font-family: Arial; color: #333333;'>Rating on Current Learning Management System</h2>"
@@ -969,6 +1011,16 @@ if dashboard == 'Section 5: Compensation':
 
         ratings_df = pd.DataFrame({'Satisfaction Level': categories, 'Percentage': q33ValuesCount.values})
 
+        # Define the order of the categories
+        satisfaction_order = ['Very Satisfied', 'Satisfied', 'Neutral', 'Dissatisfied', 'Very Dissatisfied']
+
+        # Convert 'Satisfaction Level' to a categorical variable with the specified order
+        ratings_df['Satisfaction Level'] = pd.Categorical(ratings_df['Satisfaction Level'], categories=satisfaction_order, ordered=True)
+
+        # Sort the DataFrame by 'Satisfaction Level'
+        ratings_df.sort_values('Satisfaction Level', inplace=True)
+
+
         # Display title and median score
         title_html = f"<h2 style='font-size: 17px; font-family: Arial; color: #333333;'>Rating on Compensation Campaign</h2>"
         caption_html = f"<div style='font-size: 15px; font-family: Arial; color: #707070;'>The median satisfaction score is {q33MedianScore:.1f}</div>"
@@ -1176,6 +1228,16 @@ if dashboard == 'Section 6: Payroll':
 
         ratings_df = pd.DataFrame({'Satisfaction Level': categories, 'Percentage': q42ValuesCount.values})
 
+        # Define the order of the categories
+        satisfaction_order = ['Very Satisfied', 'Satisfied', 'Neutral', 'Dissatisfied', 'Very Dissatisfied']
+
+        # Convert 'Satisfaction Level' to a categorical variable with the specified order
+        ratings_df['Satisfaction Level'] = pd.Categorical(ratings_df['Satisfaction Level'], categories=satisfaction_order, ordered=True)
+
+        # Sort the DataFrame by 'Satisfaction Level'
+        ratings_df.sort_values('Satisfaction Level', inplace=True)
+
+
         # Display title and median score
         title_html = f"<h2 style='font-size: 17px; font-family: Arial; color: #333333;'>Rating on Current Payroll System</h2>"
         caption_html = f"<div style='font-size: 15px; font-family: Arial; color: #707070;'>The median satisfaction score is {q42MedianScore:.1f}</div>"
@@ -1320,7 +1382,7 @@ if dashboard == 'Section 6: Payroll':
     # Checkbox to decide whether to display the complete DataFrame
     if st.checkbox('Display complete specific features of the current system that people like/that made people choose it'):
         # Convert DataFrame to HTML and display it
-        html = filtered_data.iloc[:,53].to_html(index=False)
+        html = filtered_data.iloc[:,53].to_frame.to_html(index=False)
         st.markdown(html, unsafe_allow_html=True)
 
     # Convert DataFrame to CSV and generate download link
@@ -1402,6 +1464,16 @@ if dashboard == "Section 7: Time Management":
         q54ValuesCount, q54MedianScore = score_distribution(filtered_data, 61)
 
         ratings_df = pd.DataFrame({'Satisfaction Level': categories, 'Percentage': q54ValuesCount.values})
+        
+        # Define the order of the categories
+        satisfaction_order = ['Very Satisfied', 'Satisfied', 'Neutral', 'Dissatisfied', 'Very Dissatisfied']
+
+        # Convert 'Satisfaction Level' to a categorical variable with the specified order
+        ratings_df['Satisfaction Level'] = pd.Categorical(ratings_df['Satisfaction Level'], categories=satisfaction_order, ordered=True)
+
+        # Sort the DataFrame by 'Satisfaction Level'
+        ratings_df.sort_values('Satisfaction Level', inplace=True)
+
 
         # Display title and median score
         title_html = f"<h2 style='font-size: 17px; font-family: Arial; color: #333333;'>Rating on Current Time Management System</h2>"
@@ -1545,7 +1617,7 @@ if dashboard == "Section 7: Time Management":
     # Checkbox to decide whether to display the complete DataFrame
     if st.checkbox('Display complete missing functionalities'):
         # Convert DataFrame to HTML and display it
-        html = filtered_data.iloc[:, 66].to_html(index=False)
+        html = filtered_data.iloc[:, 66].notna.to_frame.to_html(index=False)
         st.markdown(html, unsafe_allow_html=True)
 
     # Convert DataFrame to CSV and generate download link
@@ -1827,6 +1899,17 @@ if dashboard == "Section 8: User Experience":
         c73ValuesCount, c73MedianScore = score_distribution(filtered_data, 73)
 
         ratings_df = pd.DataFrame({'Satisfaction Level': categories, 'Percentage': c73ValuesCount.values})
+        
+        # Define the order of the categories
+        satisfaction_order = ['Very Satisfied', 'Satisfied', 'Neutral', 'Dissatisfied', 'Very Dissatisfied']
+
+        # Convert 'Satisfaction Level' to a categorical variable with the specified order
+        ratings_df['Satisfaction Level'] = pd.Categorical(ratings_df['Satisfaction Level'], categories=satisfaction_order, ordered=True)
+
+        # Sort the DataFrame by 'Satisfaction Level'
+        ratings_df.sort_values('Satisfaction Level', inplace=True)
+
+
 
         # Display title and median score
         title_html = f"<h2 style='font-size: 17px; font-family: Arial; color: #333333;'>Star Rating Prediction on User Experience</h2>"
@@ -1893,7 +1976,7 @@ if dashboard == "Section 8: User Experience":
     #check if the user wants to see the data
     if st.checkbox('Display complete description data in 3 words'):
         # Convert DataFrame to HTML and display it
-        html = filtered_data.iloc[:, 72].to_html(index=False)
+        html = filtered_data.iloc[:, 72].notna.to_frame.to_html(index=False)
         st.markdown(html, unsafe_allow_html=True)
 
     # Convert DataFrame to CSV and generate download link
