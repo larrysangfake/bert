@@ -1,5 +1,5 @@
-[![GitHub Link](https://img.shields.io/badge/GitHub-Repository-blue?logo=github)]
-[![Streamlit App](https://img.shields.io/badge/Streamlit-App-orange?logo=streamlit)]
+![GitHub Link](https://img.shields.io/badge/GitHub-Repository-blue?logo=github)
+![Streamlit App](https://img.shields.io/badge/Streamlit-App-orange?logo=streamlit)
 ## Links Running Online
 - **Streamlit Application**: 
 [![Streamlit App](https://img.shields.io/badge/Streamlit-App-orange?logo=streamlit)](https://gucciouy5ardhonqumm6p4.streamlit.app/)
